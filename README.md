@@ -1,0 +1,29 @@
+# The Void — Demo v1.0 Offline iPad PWA
+
+A cinematic solo science-fiction survival demo by **James Ritchie**. This build is ready for GitHub Pages and can be installed from Safari as an offline iPad web app.
+
+## Included in this build
+
+- Complete playable demo through the current post-clone Control Room finale
+- Local title, gameplay and credits audio under `assets/audio/`
+- Cinematic **DEMO COMPLETE** ending with Return to Title and View Credits
+- Curved, eased Luna-token travel with route trace, glow and arrival animation
+- Progressive Web App manifest, iPad icons and offline service worker
+- Browser save migration from v0.9.9
+
+## Publish on GitHub Pages
+
+1. Upload every file and folder in this repository to the repository root.
+2. In GitHub, open **Settings → Pages**.
+3. Deploy from the `main` branch and `/(root)`.
+4. Wait for the HTTPS GitHub Pages address to become available.
+
+## Install on iPad
+
+1. Open the published game in **Safari** while online.
+2. Leave the page open until the banner reports **OFFLINE DEMO READY // ADD TO HOME SCREEN**.
+3. Tap **Share → Add to Home Screen**.
+4. Launch the new Home Screen icon once while still online.
+5. Test in Airplane Mode.
+
+See `README_DEMO_V1_PWA.md` for fuller installation notes.
