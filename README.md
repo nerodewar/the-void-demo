@@ -1,6 +1,15 @@
-# The Void — Demo v1.0 Offline iPad PWA
+# The Void — Demo v1.0.4 Offline iPad PWA
 
 A cinematic solo science-fiction survival demo by **James Ritchie**. This build is ready for GitHub Pages and can be installed from Safari as an offline iPad web app.
+
+## Stability repair in v1.0.4
+
+- Play launches before the large offline archive begins caching
+- Background cache work pauses during mission startup
+- Updates reuse existing cached artwork and audio wherever possible
+- Stalled media cannot trap the opening transition
+- Installed copies automatically refresh onto the new service worker
+- Ground Control transmissions retain the black terminal typing presentation
 
 ## Included in this build
 
@@ -26,4 +35,3 @@ A cinematic solo science-fiction survival demo by **James Ritchie**. This build 
 4. Launch the new Home Screen icon once while still online.
 5. Test in Airplane Mode.
 
-See `README_DEMO_V1_PWA.md` for fuller installation notes.

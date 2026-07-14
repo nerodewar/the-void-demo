@@ -134,6 +134,7 @@
   let sequenceRunId = 0;
   let sequenceAdvanceLocked = false;
   let backgroundWarmupStarted = false;
+  let missionLaunchInProgress = false;
   let transitionRunId = 0;
   let mapRevealTimer = 0;
   let captainLogSaveTimer = 0;
@@ -698,36 +699,33 @@
     return new Promise((resolve) => window.setTimeout(resolve, ms));
   }
 
-  function preloadImage(source) {
+  function preloadImage(source, timeout = 8000) {
     if (!source) return Promise.resolve(false);
     if (imageCache.has(source)) return imageCache.get(source);
 
     const promise = new Promise((resolve) => {
       const image = new Image();
       let settled = false;
+      let timeoutId = 0;
 
       const finish = (ok) => {
         if (settled) return;
         settled = true;
+        window.clearTimeout(timeoutId);
+        image.onload = null;
+        image.onerror = null;
         resolve(ok);
       };
 
-      image.onload = async () => {
-        try {
-          if (typeof image.decode === "function") await image.decode();
-        } catch {
-          // The image is still usable when decode() is unsupported or rejects.
-        }
-        finish(true);
-      };
+      // Loading is enough for the transition. Awaiting decode() here can block
+      // iPad Safari while the service worker is also moving large PNG files.
+      image.onload = () => finish(true);
       image.onerror = () => finish(false);
       image.decoding = "async";
+      timeoutId = window.setTimeout(() => finish(false), Math.max(1000, timeout));
       image.src = source;
 
-      if (image.complete) {
-        if (image.naturalWidth > 0) image.onload();
-        else finish(false);
-      }
+      if (image.complete) finish(image.naturalWidth > 0);
     });
 
     imageCache.set(source, promise);
@@ -962,7 +960,6 @@
     titleScreen.hidden = false;
     refreshTitleMenu();
     preloadImage("assets/IMG00.png");
-  preloadImage("assets/IMG56.png");
     preloadImage("assets/IMG56.png");
     requestAnimationFrame(() => {
       titleScreen.classList.add("is-visible");
@@ -972,34 +969,55 @@
   }
 
   async function startNewMission({ force = false } = {}) {
+    if (missionLaunchInProgress) return;
     if (!force && hasStoredMission()) {
       const confirmed = window.confirm("Start a new mission? Existing checkpoint progress will be overwritten.");
       if (!confirmed) return;
     }
 
-    cancelActiveSequence();
-    closeAllDialogs();
-    fadeTitleMusicOut(1050);
-    clearStoredMission();
-    state = { ...defaultState };
-    saveState();
-    backgroundWarmupStarted = false;
+    missionLaunchInProgress = true;
+    playButton.disabled = true;
+    playButton.setAttribute("aria-busy", "true");
+    window.dispatchEvent(new CustomEvent("thevoid:mission-launch"));
 
-    await runCinematicTransition({
-      kicker: "ELITE FORCES // MISSION ARCHIVE",
-      title: "MISSION ARCHIVE INITIALISING",
-      text: story("startnewmission.missionArchiveInitialising", { state, clocks: typeof clocks !== "undefined" ? clocks : "", checkpointText: typeof checkpointText !== "undefined" ? checkpointText : "" }),
-      duration: 3700,
-      showInfo: true,
-      fadeInDuration: 450,
-      fadeOutDuration: 1100,
-      task: async () => {
-        hidePrimaryScreens();
-        cinematicShell.hidden = false;
-        await preloadImages(["assets/IMG01.png", "assets/IMG02.png"], 2);
-        await showIntroScene(0, { initial: true });
-      }
-    });
+    try {
+      cancelActiveSequence();
+      closeAllDialogs();
+      fadeTitleMusicOut(700);
+      clearStoredMission();
+      state = { ...defaultState };
+      saveState();
+      backgroundWarmupStarted = false;
+
+      await runCinematicTransition({
+        kicker: "ELITE FORCES // MISSION ARCHIVE",
+        title: "MISSION ARCHIVE INITIALISING",
+        text: story("startnewmission.missionArchiveInitialising", { state, clocks: typeof clocks !== "undefined" ? clocks : "", checkpointText: typeof checkpointText !== "undefined" ? checkpointText : "" }),
+        duration: 1600,
+        showInfo: true,
+        fadeInDuration: 320,
+        fadeOutDuration: 650,
+        task: async () => {
+          hidePrimaryScreens();
+          cinematicShell.hidden = false;
+          await preloadImage("assets/IMG01.png");
+          preloadImage("assets/IMG02.png");
+          await showIntroScene(0, { initial: true });
+        }
+      });
+    } catch (error) {
+      console.error("[The Void] Mission launch recovered from an error", error);
+      cinematicTransition.hidden = true;
+      cinematicTransition.classList.remove("is-active", "is-leaving", "has-info");
+      hidePrimaryScreens();
+      cinematicShell.hidden = false;
+      await showIntroScene(0, { initial: true });
+    } finally {
+      missionLaunchInProgress = false;
+      playButton.disabled = false;
+      playButton.removeAttribute("aria-busy");
+      window.dispatchEvent(new CustomEvent("thevoid:mission-launched"));
+    }
   }
 
   async function continueMission() {
@@ -3766,7 +3784,6 @@
     swapRoomMedia(definition, immediate);
     fadeRoomText(definition.text, immediate);
     warmAdjacentRoomImages(room);
-    startBackgroundImageWarmup();
   }
 
   async function moveToRoom(targetRoom, { force = false } = {}) {

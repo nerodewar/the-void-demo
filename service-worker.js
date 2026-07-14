@@ -1,6 +1,6 @@
 "use strict";
 
-const CACHE_VERSION = "the-void-demo-v1.0.3";
+const CACHE_VERSION = "the-void-demo-v1.0.4";
 const CORE_ASSETS = [
   "./",
   "./index.html",
@@ -96,28 +96,50 @@ function scopedUrl(path) {
   return new URL(path, self.registration.scope).href;
 }
 
-async function putAsset(cache, path) {
+async function putAsset(cache, path, { refresh = false } = {}) {
   const url = scopedUrl(path);
   const existing = await cache.match(url, { ignoreSearch: true });
-  if (existing) return true;
+  if (existing && !refresh) return true;
+
+  // Reuse large unchanged media from the previous app cache. A service-worker
+  // version bump should not force the iPad to redownload the entire 142 MB game.
+  if (!refresh) {
+    const previous = await caches.match(url, { ignoreSearch: true });
+    if (previous) {
+      await cache.put(url, previous.clone());
+      return true;
+    }
+  }
+
   const response = await fetch(new Request(url, { cache: "reload", credentials: "same-origin" }));
   if (!response.ok) throw new Error(`HTTP ${response.status} for ${path}`);
   await cache.put(url, response);
   return true;
 }
 
+async function cleanupOldCaches() {
+  const keys = await caches.keys();
+  await Promise.all(
+    keys
+      .filter((key) => key.startsWith("the-void-") && key !== CACHE_VERSION)
+      .map((key) => caches.delete(key))
+  );
+}
+
+const yieldToBrowser = () => new Promise((resolve) => setTimeout(resolve, 60));
+
 self.addEventListener("install", (event) => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE_VERSION);
-    for (const asset of CORE_ASSETS) await putAsset(cache, asset);
+    for (const asset of CORE_ASSETS) await putAsset(cache, asset, { refresh: true });
     await self.skipWaiting();
   })());
 });
 
 self.addEventListener("activate", (event) => {
   event.waitUntil((async () => {
-    const keys = await caches.keys();
-    await Promise.all(keys.filter((key) => key.startsWith("the-void-") && key !== CACHE_VERSION).map((key) => caches.delete(key)));
+    // Keep the previous complete archive until the new one is safely ready.
+    // This avoids both an offline gap and a giant recache during game launch.
     await self.clients.claim();
   })());
 });
@@ -127,6 +149,12 @@ async function notify(client, payload) {
 }
 
 let cacheJob = null;
+let cachePaused = false;
+
+async function waitForCacheResume() {
+  while (cachePaused) await new Promise((resolve) => setTimeout(resolve, 250));
+}
+
 async function cacheAllAssets(client) {
   if (cacheJob) return cacheJob;
   cacheJob = (async () => {
@@ -134,22 +162,37 @@ async function cacheAllAssets(client) {
     let completed = 0;
     let failed = 0;
     for (const asset of ALL_ASSETS) {
+      await waitForCacheResume();
       try { await putAsset(cache, asset); }
       catch (error) { failed += 1; console.warn("[The Void SW] Cache failed", asset, error); }
       completed += 1;
-      if (completed === ALL_ASSETS.length || completed % 2 === 0) {
+      if (completed === ALL_ASSETS.length || completed % 4 === 0) {
         await notify(client, { type: "CACHE_PROGRESS", completed, total: ALL_ASSETS.length });
       }
+      await yieldToBrowser();
     }
-    await notify(client, failed
-      ? { type: "CACHE_ERROR", failed, total: ALL_ASSETS.length }
-      : { type: "OFFLINE_READY", total: ALL_ASSETS.length });
+
+    if (failed) {
+      await notify(client, { type: "CACHE_ERROR", failed, total: ALL_ASSETS.length });
+    } else {
+      await cleanupOldCaches();
+      await notify(client, { type: "OFFLINE_READY", total: ALL_ASSETS.length });
+    }
   })().finally(() => { cacheJob = null; });
   return cacheJob;
 }
 
 self.addEventListener("message", (event) => {
-  if (event.data?.type === "CACHE_ALL_ASSETS") event.waitUntil(cacheAllAssets(event.source));
+  const type = event.data?.type;
+  if (type === "CACHE_PAUSE") {
+    cachePaused = true;
+    return;
+  }
+  if (type === "CACHE_RESUME") {
+    cachePaused = false;
+    return;
+  }
+  if (type === "CACHE_ALL_ASSETS") event.waitUntil(cacheAllAssets(event.source));
 });
 
 self.addEventListener("fetch", (event) => {
@@ -160,10 +203,12 @@ self.addEventListener("fetch", (event) => {
   if (event.request.mode === "navigate") {
     event.respondWith((async () => {
       const cache = await caches.open(CACHE_VERSION);
-      const cached = await cache.match(scopedUrl("./index.html"), { ignoreSearch: true });
+      const indexUrl = scopedUrl("./index.html");
+      const cached = await cache.match(indexUrl, { ignoreSearch: true })
+        || await caches.match(indexUrl, { ignoreSearch: true });
       try {
         const response = await fetch(event.request);
-        if (response.ok) cache.put(scopedUrl("./index.html"), response.clone());
+        if (response.ok) cache.put(indexUrl, response.clone());
         return response;
       } catch {
         return cached || Response.error();
@@ -174,7 +219,8 @@ self.addEventListener("fetch", (event) => {
 
   event.respondWith((async () => {
     const cache = await caches.open(CACHE_VERSION);
-    const cached = await cache.match(event.request, { ignoreSearch: true });
+    const cached = await cache.match(event.request, { ignoreSearch: true })
+      || await caches.match(event.request, { ignoreSearch: true });
     if (cached) return cached;
     try {
       const response = await fetch(event.request);
