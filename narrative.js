@@ -19,7 +19,7 @@
         "It is her first solo mission through deep space.\n\n" +
         "With Earth still seventy-two hours away, Luna has crossed the last navigational threshold before home.\n\n" +
         "A silent, uncharted expanse known as The Void."),
-    "intro.emergencyWake": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("The fire alarm sounds, waking up Luna out of cryosleep.\n\n" +
+    "intro.emergencyWake": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("The fire alarm sounds, waking up Luna...\n\n" +
         "Emergency lights flood the chamber. On board, a system is on fire, though the ship reports no impact and no mechanical fault.\n\n" +
         "Still disoriented, Luna releases the sleep pod and goes to investigate."),
 
@@ -108,10 +108,10 @@ REBREATHER: ${formatRebreatherTime(state.rebreatherSeconds)}. Luna must open the
     "getroomdefinition.satNavArray": ({ state = {}, clocks = "", checkpointText = "" } = {}) => (state.satNavRepaired
           ? "The replacement locks into place. Position data floods back into the ship and the Earth-return vector stabilises. Luna is still outside, and something has disturbed the hull plating beside the array."
           : "Luna opens the navigation housing. Several contacts have been torn from their sockets rather than burned out. She braces one hand against the hull and aligns the replacement module with the exposed assembly."),
-    "getroomdefinition.crewQuarters": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Luna stands beside the open cryosleep pod, fighting through the last fog of suspended sleep. The alarm repeats beyond the bulkhead. Every third pulse is followed by a faint vibration through the deck.\n\nThe ship map identifies an active fire in Life Support."),
+    "getroomdefinition.crewQuarters": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Luna emerges from sleep, the fire alarm sounding all around her.\n\nThe ship map identifies an active fire in Life Support."),
     "getroomdefinition.hallway2": ({ state = {}, clocks = "", checkpointText = "" } = {}) => (state.alienEncountered
           ? "The emergency lights no longer pulse in sequence. Somewhere inside the walls, a slick weight moves against the ship's direction of travel."
-          : "The main hallway flashes between darkness and amber emergency light. Smoke has begun to drift from the Life Support access door.\n\nThe Control Room branches away to the north. Life Support lies at the far end of the corridor."),
+          : "The main hallway flashes amber. Smoke begins to drift in from the Life Support access door.\n\nThe Control Room branches away to the north. Life Support lies at the far end of the corridor."),
     "getroomdefinition.controlRoom2": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("The rest of the ship has vanished from the schematic. Only Control remains. Ground Control has frozen Luna's Earth approach and marked the vessel as a biological containment risk.\n\nThe relay stays open, but nobody speaks."),
     "getroomdefinition.controlRoom3": ({ state = {}, clocks = "", checkpointText = "" } = {}) => (state.engineRepaired
             ? "Luna reaches Control in darkness. The crisis carrier is still open. Ground Control has received the engine telemetry and is waiting for her report."
@@ -121,7 +121,7 @@ REBREATHER: ${formatRebreatherTime(state.rebreatherSeconds)}. Luna must open the
             : state.satNavDiagnosed
               ? "The failed component is external. Control has loaded the repair route from the Airlock to the satellite array and released a replacement module from the EVA service locker."
               : "Navigation has stopped receiving position data. Luna must diagnose the external array before she can leave the ship."),
-    "getroomdefinition.lifeSupport2": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Heat breaks across Luna's suit as the access door opens. Fire has taken hold around the oxygen supply assembly, feeding on scorched insulation and leaking coolant vapour.\n\nThe automatic suppression system is offline. Luna can trigger the portable suppressant from her suit, but she will have to remain close to the flames."),
+    "getroomdefinition.lifeSupport2": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("The heat is immense as Luna opens the doors to find fire has taken hold of the whole life support systems, feeding on the oxygen supply tanks.\n\nThe automatic suppression system is offline. Luna will have to put the fire out herself!"),
     "getroomdefinition.southHallway2": ({ state = {}, clocks = "", checkpointText = "" } = {}) => (state.alienEncountered
           ? "The corridor has gone unnaturally still. Black smears glisten along the ceiling seams, leading toward Engineering. Behind Luna, something clicks against the Kitchen door."
           : "The southern wing was kept offline during cryosleep. Its lights return reluctantly, one strip at a time. The Laboratory branches to the right. Farther down are the Store Room, Kitchen and the locked Engineering Room."),
