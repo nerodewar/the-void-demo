@@ -36,7 +36,7 @@
     "showlosescreen.biologicalSignalLost": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("No further transmission received from Luna H."),
 
     // GAME ENTRY
-    "entergame.deckCutawayOnline": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Locating Luna H. and reconstructing the accessible route"),
+    "entergame.deckCutawayOnline": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Begin the game..."),
 
     // ROOM NARRATIVE (all map states)
     "getroomdefinition.controlRoom": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("The false Ground Control signal has collapsed into static. Luna seals the relay and checks the specimen jar at her belt. The black residue inside is still moving.\n\nThe Laboratory may be able to tell her what entered the ship, how it travelled here and whether it can be killed."),
