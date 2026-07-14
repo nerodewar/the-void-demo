@@ -24,7 +24,7 @@
         "Still disoriented, Luna releases the pod seals and goes to investigate."),
 
     // SYSTEM TRANSITIONS
-    "startnewmission.missionArchiveInitialising": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Pilot: Luna H. // Destination: Earth // Deep-space route loading"),
+    "startnewmission.missionArchiveInitialising": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Game loading..."),
 
     // CONTINUE / CHECKPOINT TRANSITIONS
     "continuemission.missionStateRecovered": ({ state = {}, clocks = "", checkpointText = "" } = {}) => (checkpointText),
