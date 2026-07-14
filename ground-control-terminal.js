@@ -584,22 +584,38 @@
   }
 
   if (sequenceDialog) {
-    const sequenceObserver = new MutationObserver(() => {
-      if (!sequenceDialog.open) {
-        if (activeSession?.dialog === sequenceDialog) cancelActiveSession();
+    const resetSequenceTerminal = () => {
+      if (activeSession?.dialog === sequenceDialog) cancelActiveSession();
+      if (sequenceDialog.classList.contains("gct-terminal")) {
         sequenceDialog.classList.remove("gct-terminal");
-        sequenceLinkActive = false;
-        lastSequenceSignature = "";
-        return;
       }
-      queueSequenceCheck();
+      sequenceLinkActive = false;
+      lastSequenceSignature = "";
+      sequenceCheckQueued = false;
+    };
+
+    // Observe only the dialog's open state. Watching its class or typed text
+    // creates a feedback loop because this enhancement changes both itself.
+    const sequenceObserver = new MutationObserver(() => {
+      if (sequenceDialog.open) queueSequenceCheck();
+      else resetSequenceTerminal();
     });
 
     sequenceObserver.observe(sequenceDialog, {
       attributes: true,
-      attributeFilter: ["open", "class"],
-      childList: true,
-      subtree: true
+      attributeFilter: ["open"]
+    });
+
+    // The game's own sequence handler runs first because script.js loads before
+    // this file. Check again after it advances to the next transmission frame.
+    sequenceButton?.addEventListener("click", () => {
+      window.setTimeout(queueSequenceCheck, 0);
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (!sequenceDialog.open) return;
+      if (event.key !== "Enter" && event.key !== " ") return;
+      window.setTimeout(queueSequenceCheck, 0);
     });
   }
 
