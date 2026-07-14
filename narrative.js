@@ -53,19 +53,19 @@ The ship cannot keep Luna alive until Earth arrival. She must breach the South H
 
 ${clocks} Luna must reconstruct the orbital cipher and force the door before the oxygen deficit becomes irreversible.`),
     "getroomdefinition.securityControl": ({ state = {}, clocks = "", checkpointText = "" } = {}) => (!state.securityOverrideComplete
-            ? `The compact security room is intact, but every lockdown control is sealed behind a second orbital lattice. Breaking it will release the weapons lockers and restore environmental command.
+            ? `The compact security room is intact, but every lockdown control is sealed behind a second orbital lattice. Breaking it will release the weapons lockers and restore the air supply.
 
 ${clocks}`
             : !state.cloneIncapacitated
-              ? `Security operations are online. The tactical camera identifies a human figure inside Supply as LUNA H. It is standing between Luna and the oxygen tank, helmet, flamethrower and plasma cells.
+              ? `Security operations are online. The tactical camera identifies a human figure inside Supply. It is standing between Luna and the oxygen tank, helmet, flamethrower, and plasma cells.
 
 The imitation has completed a human form. It needs air.`
-              : `Tactical Supply holds at 3.2% oxygen under stable pressure. The copied human body has collapsed. Security Control has released a ninety-second emergency rebreather for the retrieval.
+              : `Tactical Supply holds at 3.2% oxygen under stable pressure. The alien has collapsed. Security Control has released a ninety-second emergency rebreather for the retrieval.
 
 Luna has one brief crossing to secure the real oxygen equipment.`),
     "getroomdefinition.tacticalSupply": ({ state = {}, clocks = "", checkpointText = "" } = {}) => (state.tacticalGearCollected
-            ? "The helmet seals and the oxygen line turns green. Luna seats fresh plasma cells, shoulders the flamethrower and checks the pressure gauge. She can breathe. The ship still cannot."
-            : `The temporary hood fogs with every breath. The imitation lies motionless beside the tactical lockers, its copied lungs defeated by the purge.
+            ? "The helmet seals and the oxygen comes on. Luna grabs fresh plasma cells, reaches for the flamethrower and checks the pressure gauge. All systems go..."
+            : `The temporary hood fogs with every breath. The imitation lies there, motionless, defeated by the purge.
 
 REBREATHER: ${formatRebreatherTime(state.rebreatherSeconds)}. Luna must open the locker and connect the proper oxygen system now.`),
     "getroomdefinition.line2738": ({ state = {}, clocks = "", checkpointText = "" } = {}) => (state.actTwoComplete
