@@ -40,7 +40,7 @@
 
     // ROOM NARRATIVE (all map states)
     "getroomdefinition.controlRoom": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("The signal turns into static. Luna still has the specimen jar of black residue from the mess hall.\n\nThe Laboratory may be able to tell her more about it"),
-    "getroomdefinition.hallway": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Luna moves towards the through the hallway. it is eerily quiet..."),
+    "getroomdefinition.hallway": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Luna moves towards the laboratory through the hallway. It is eerily quiet..."),
     "getroomdefinition.lifeSupport": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("The oxygen bypass is holding. The sample may explain how it tampered with the life support systems..."),
     "getroomdefinition.southHallway": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Black smears remain on the ceiling and walls... Laboratory 07 waits at the end of the corridor under cool, blue light..."),
     "getroomdefinition.laboratory": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("The Laboratory is sterile and silent. Luna locks the door behind her and places the specimen beside the molecular analysis unit.\n\nInside the jar, the residue stretches toward the scanner light."),
@@ -69,33 +69,33 @@ Luna has one brief crossing to secure the real oxygen equipment.`),
 
 REBREATHER: ${formatRebreatherTime(state.rebreatherSeconds)}. Luna must open the locker and connect the proper oxygen system now.`),
     "getroomdefinition.line2738": ({ state = {}, clocks = "", checkpointText = "" } = {}) => (state.actTwoComplete
-            ? "The terminal has gone silent. Ground Control is not on the channel. The organism has learned the ship's communications architecture and used it to imitate a rescue directive."
+            ? "The terminal has gone silent. The data shows Ground Control hasn't made contact in hours... 'So, who was that...?!' asks Luna. "
             : state.lightsRestored
-              ? "The Control Room is bright again. Camera feeds populate the surveillance terminal, including archived recordings from the hours while Luna remained in cryosleep."
+              ? "The Control Room is bright again. Camera feeds populate the surveillance terminal, including archived recordings from the hours while Luna was sleeping."
               : "Every primary light aboard the ship is dead. The Control Room survives on red indicators and Luna's flashlight. Diagnostics identify one missing power relay in the lighting grid."),
     "getroomdefinition.powerJunction": ({ state = {}, clocks = "", checkpointText = "" } = {}) => (state.lightsRestored
             ? "White light rolls through the corridor one fixture at a time. The grid stabilises. Whatever Luna struck with the plasma gun has retreated into the walls."
             : state.relayFound
               ? "The recovered relay is ready for installation, but wet movement is closing through the corridor. Luna must deal with the organism first."
-              : "The junction reports one absent module: the main power relay. It was not blown. It was physically removed and carried into Storage."),
+              : "The junction reports one absent module: the main power relay. There is a replacement relay in storage
     "getroomdefinition.darkCorridor": ({ state = {}, clocks = "", checkpointText = "" } = {}) => (!state.alienRepelled
             ? "The organism closes across the corridor before Luna can reach Storage. It feels along the walls toward her, recoiling whenever the flashlight crosses its face. She has no time to search. She must hide now or face it with the plasma gun already in her hand."
             : state.relayFound
               ? "The corridor is clear and the lighting relay is secured. The Power Junction is ready for the repair."
-              : "The organism has retreated into the walls. Luna keeps the plasma gun raised and moves toward Storage to scour the equipment crates for the missing lighting relay."),
+              : "The organism has retreated into the walls. Luna keeps the plasma gun raised and moves toward Storage to search for the lighting relay."),
     "getroomdefinition.storage": ({ state = {}, clocks = "", checkpointText = "" } = {}) => (state.relayFound
             ? "The opened crates are empty. Luna has recovered the power relay and the remaining lighting-grid parts."
-            : "With the immediate threat driven back, Luna can finally search properly. Shelving divides the store room into blind corners: tool cabinet, floor crates and sealed maintenance locker."),
+            : "With the alien driven back, Luna catches her breath. The relay must be in here amongst the shelves and cables."),
     "getroomdefinition.maintenanceTunnels": ({ state = {}, clocks = "", checkpointText = "" } = {}) => (state.lightsOut
-          ? "The tunnel lighting is dead. Luna's flashlight cuts a narrow path across pipes, cable trunks and open grating. Something shifts beyond the beam, then keeps pace inside the wall beside her."
+          ? "The tunnel lighting is dead. Luna feels can feel an eery presence this way..."
           : state.branch === "signal"
-            ? "The crisis transmission ends behind Luna as she enters the maintenance route. Engine 02 is losing thrust. The only path to the Main Engine Room is a narrow service passage threaded through the ship's machinery."
+            ? "The only path to the Main Engine Room is a narrow service passage threaded through the ship's machinery."
             : state.satNavFailed
               ? "The maintenance route leads back toward Control. Navigation warnings pulse through Luna's suit as the ship drifts away from its Earth approach vector."
               : "Luna leaves the transmitter silent and moves into the maintenance access alone. The tunnels magnify every breath and every soft movement travelling through the hull."),
-    "getroomdefinition.mainEngineRoom": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Engine 02 catches and settles into a steady burn. One second later, every overhead light dies. Luna raises the flashlight. The engine room has become a cavern of black machinery and isolated red indicators."),
+    "getroomdefinition.mainEngineRoom": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("The engine room is in total darkness..."),
     "getroomdefinition.mainEngineRoom2": ({ state = {}, clocks = "", checkpointText = "" } = {}) => (state.branch === "signal"
-          ? "Engine 02 shudders inside its mounting frame. Coolant pressure is falling and the magnetic feed regulator has fused half-open. Luna can replace the damaged regulator manually, but the engine must remain live while she works."
+          ? "Engine 02 grinds to a complete stop. Luna must replace the damaged regulator manually to get it running again."
           : state.satNavFailed
             ? "The engines remain stable, but the navigation alarm now dominates the room. The satellite array has stopped returning position data. The ship is flying blind."
             : "The engine assembly is intact. Luna reaches the diagnostic console and begins checking the systems before the organism can sabotage them. A warning blooms across the display: SATELLITE NAVIGATION SIGNAL LOST."),
@@ -115,7 +115,7 @@ REBREATHER: ${formatRebreatherTime(state.rebreatherSeconds)}. Luna must open the
     "getroomdefinition.controlRoom2": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("The rest of the ship has vanished from the schematic. Only Control remains. Ground Control has frozen Luna's Earth approach and marked the vessel as a biological containment risk.\n\nThe relay stays open, but nobody speaks."),
     "getroomdefinition.controlRoom3": ({ state = {}, clocks = "", checkpointText = "" } = {}) => (state.engineRepaired
             ? "Luna reaches Control in darkness. The crisis carrier is still open. Ground Control has received the engine telemetry and is waiting for her report."
-            : "The crisis signal has left the ship. Before Ground Control can finish responding, Engine 02 falls out of synchronisation. The map has collapsed to one maintenance route leading to the Main Engine Room."),
+            : "The crisis signal has left the ship. Engine 02 has failed and needs repairing manually. The Main Engine Room lies to the south via the Maintenance Tunnels."),
     "getroomdefinition.controlRoom4": ({ state = {}, clocks = "", checkpointText = "" } = {}) => (state.satNavRepaired
             ? "The return vector is stable again. Ground Control has acquired the vessel's telemetry and is waiting on the relay."
             : state.satNavDiagnosed
@@ -124,13 +124,13 @@ REBREATHER: ${formatRebreatherTime(state.rebreatherSeconds)}. Luna must open the
     "getroomdefinition.lifeSupport2": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("The heat is immense as Luna opens the doors to find fire has taken hold of the whole life support systems, feeding on the oxygen supply tanks.\n\nThe automatic suppression system is offline. Luna will have to put the fire out herself!"),
     "getroomdefinition.southHallway2": ({ state = {}, clocks = "", checkpointText = "" } = {}) => (state.alienEncountered
           ? "The corridor has gone unnaturally still. Black smears glisten along the ceiling seams, leading toward Engineering. Behind Luna, something clicks against the Kitchen door."
-          : "The southern wing was kept offline during cryosleep. Its lights return reluctantly, one strip at a time. The Laboratory branches to the right. Farther down are the Store Room, Kitchen and the locked Engineering Room."),
-    "getroomdefinition.laboratory3": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("The sample clings to the inside of the jar instead of settling at the bottom. When Luna turns her wrist, the residue stretches toward the warmth of her hand.\n\nThe ship's laboratory cannot identify its composition."),
-    "getroomdefinition.laboratory4": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("A glossy black residue has spread across the workstation in branching, thread-like patterns. It is too thick to be coolant and too warm to be machine oil.\n\n\"What the fuck...?\" Luna whispers. The nearest strand contracts at the sound of her voice."),
-    "getroomdefinition.laboratory5": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("The Laboratory should have been sterile when Luna entered cryosleep. One workstation is powered, its task light shining across a surface that looks wet."),
+          : "The southern hall is unlocked. The Laboratory branches to the right. Further down are the Store Room, Kitchen and the Engineering Room. \n\n Security measures are still resolving..."),
+    "getroomdefinition.laboratory3": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("The sample clings to the inside of the jar as if alive. When Luna taps the glass, the residue reaches for her finger tip.\n\nThe ship's laboratory cannot identify its composition."),
+    "getroomdefinition.laboratory4": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("A sticky black residue is all over the workstation... Luna cannot identify this substance.\n\n\"What the fuck...?\" Luna whispers. The residue contracts at the sound of her voice."),
+    "getroomdefinition.laboratory5": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("The workstation has clearly been used. One workstation is powered on, its light shining across a surface that looks wet..."),
     "getroomdefinition.kitchenMess": ({ state = {}, clocks = "", checkpointText = "" } = {}) => (state.alienEncountered
           ? "The thing has withdrawn from the ceiling, leaving black strings across the metal. The door to the corridor has released. Luna can hear it moving toward Engineering."
-          : "The Kitchen is empty, but it does not feel abandoned. A cup sits in the centre of a table. One chair faces the wrong direction.\n\nThe door clicks shut behind Luna. On the counter, beneath a cold utility light, lies another trace of black residue."),
+          : "The Kitchen is empty, but it someone has been here... a cup sits in the centre of a table. One chair faces the wrong direction.\n\nThe door clicks shut behind Luna. On the counter lies another trace of sticky black residue."),
     "getroomdefinition.storeRoom": ({ state = {}, clocks = "", checkpointText = "" } = {}) => (state.equipmentTaken
           ? "The open cases are empty. Luna has the plasma gun, flashlight and Engineering key. The creature is somewhere beyond the wall."
           : "The emergency store contains exactly what Luna needs: a plasma gun in a sealed case, a heavy flashlight and the manual access key for Engineering. She takes all three."),
@@ -147,16 +147,16 @@ REBREATHER: ${formatRebreatherTime(state.rebreatherSeconds)}. Luna must open the
     "logdamage.checkpoint01": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Sabotage confirmed // Mission state preserved"),
 
     // KITCHEN ENCOUNTER
-    "inspectkitchencounter.theCounter": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("The worktop is almost spotless. In the centre lies another splash of black residue, still wet, its edges slowly drawing themselves into thin branching lines.\n\nBehind Luna, the room's ventilation system stops."),
-    "inspectkitchencounter.itIsAboveHer": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("A drop lands beside Luna's hand.\n\nShe looks up.\n\nA vast black shape has unfolded from the ceiling, suspended on strands of its own body. Its mouth opens without breathing. For one impossible second, it studies her face."),
+    "inspectkitchencounter.theCounter": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("The worktop is tidy but there lies another splash of black residue.\n\nBehind Luna, the room's ventilation system stops abruptly."),
+    "inspectkitchencounter.itIsAboveHer": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Luna turns around...\n\nShe looks up.\n\nA vast black sludge with teeth hangs from the vents on the ceiling, menacingly opening its mouth as if to engorge Luna."),
 
     // HIDING ENCOUNTER
-    "completehiding.theVoiceWithdraws": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Luna remains silent.\n\nThe copied voice asks once more, softer this time. Then the organism drags itself away through the machinery. The ship hum gradually returns.\n\nA diagnostic display wakes beside her: CREW DETECTED — 02."),
+    "completehiding.theVoiceWithdraws": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Luna remains silent.\n\nThe chilling voice asks one more time. Then the organism drags itself away through the air vents.\n\nA diagnostic display wakes beside her: CREW DETECTED — 02."),
     "completehiding.checkpoint02": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Two biological signatures detected // Mission state preserved"),
 
     // SIGNAL BRANCH
-    "startsignalbranch.theSignalLeavesTheShip": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Luna returns to Control and opens the priority relay. She reports the sabotage, the residue and the organism wearing her voice.\n\nGround Control receives the signal. Then every engine warning on the console turns red."),
-    "startsignalbranch.aSecondCrisis": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Engine 02 falls out of synchronisation. Ground Control tells Luna the regulator must be replaced manually. The ship schematic contracts to a single route: Control, Maintenance Tunnels, Main Engine Room."),
+    "startsignalbranch.theSignalLeavesTheShip": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Luna returns to the Control Room and opens the priority relay. She reports the sabotage, the residue and the alien organism.\n\nSuddenly, emergency warnings light up the central command unit."),
+    "startsignalbranch.aSecondCrisis": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Engine 02 has failed. Ground Control tells Luna the regulator must be replaced manually."),
     "startsignalbranch.engine02RouteIsolated": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Contracting the schematic to Control, Maintenance Tunnels and Main Engine Room"),
 
     // ALONE BRANCH
@@ -164,8 +164,8 @@ REBREATHER: ${formatRebreatherTime(state.rebreatherSeconds)}. Luna must open the
     "startalonebranch.maintenanceRouteIsolated": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Reconstructing the immediate route through Engineering"),
 
     // ENGINE REPAIR
-    "repairengine.thrustRestored": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("The new regulator seats. Engine 02 catches with a violent metallic shudder, then steadies. Thrust returns across the vessel."),
-    "repairengine.theLightsGoOut": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Every overhead light extinguishes at once. Luna's flashlight snaps on, carving a thin white tunnel through the dark.\n\nSomething moves outside the Engine Room."),
+    "repairengine.thrustRestored": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("The new regulator seats. Engine 02 starts up abruptly, then steadies. Thrust returns to the engine."),
+    "repairengine.theLightsGoOut": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Suddenly, all of the lights go out! Luna puts on her flashlight.\n\nSomething moves outside the Engine Room."),
     "repairengine.returnRouteRecalculated": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Emergency navigation active // Flashlight required"),
 
     // SAT-NAV FAILURE
@@ -185,26 +185,26 @@ REBREATHER: ${formatRebreatherTime(state.rebreatherSeconds)}. Luna must open the
     "beginblackoutact.checkpoint03": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Shipwide lighting failure // Reconstructing emergency search grid"),
 
     // POWER RELAY
-    "findrelay.powerRelayRecovered": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Luna finds the relay secured beneath a storage crate. It has not failed. Someone removed it from the lighting grid and hid it here.\n\nA heavy impact sounds once in the corridor outside."),
+    "findrelay.powerRelayRecovered": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Luna finds the relay secured beneath a storage crate.\n\nA heavy impact sounds once in the corridor outside."),
 
     // BLACKOUT HIDING ENCOUNTER
-    "hideandfailblackout.itHeardHer": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Luna kills the flashlight and folds into the maintenance recess. The corridor becomes completely black.\n\nThe organism stops outside. A hand, almost shaped like hers, closes around the edge of the hiding place."),
-    "hideandfailblackout.found": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("It finds her. The creature surges into the recess, its false face opening at point-blank range.\n\nLuna is frightened, but she is not helpless."),
-    "hideandfailblackout.counterattack": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Luna drives the plasma gun between them and fires. Blue-white energy tears through the organism and blasts it backward into the conduits.\n\nHiding bought her one breath. Courage decides what she does with it."),
+    "hideandfailblackout.itHeardHer": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Luna turns off her flashlight. The corridor becomes completely dark..."),
+    "hideandfailblackout.found": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("The thing lunges for Luna, it's sticky black tenticles clawing at her violently!\n\nLuna is frightened, but she is not helpless."),
+    "hideandfailblackout.counterattack": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Luna pulls out her plasma gun and blasts the alien backwards into the darkness!"),
 
     // BLACKOUT CONFRONTATION
     "facealienblackout.faceIt": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Luna plants her boots, raises the plasma gun and fires. The blast tears through the organism's outer shape and throws it backward into the conduits. Its scream travels through every speaker on the deck."),
     "facealienblackout.restoreTheGrid": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("With the corridor clear, Luna locks the recovered relay into the empty housing and routes power through the emergency bus."),
-    "facealienblackout.theLightsReturn": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Fixtures ignite in sequence across the ship. White light floods the corridor. The damaged organism retreats deeper into the walls.\n\nLuna returns to the communications station in Control."),
+    "facealienblackout.theLightsReturn": ({ state = {}, clocks = "", checkpointText = "" } = {}) => (" White light floods the corridor. The damaged organism retreats into the walls.\n\nLuna returns to the communications station in Control."),
     "facealienblackout.controlRoomRestored": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Returning Luna to the communications station"),
 
     // restartblackoutcheckpoint
     "restartblackoutcheckpoint.checkpoint03": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Restoring the lighting-failure mission state"),
 
     // SURVEILLANCE ARCHIVE
-    "opensurveillance.twentyFourCamerasOnline": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("The restored terminal rebuilds the missing archive. Several recordings were classified as ordinary crew movement, even though Luna is the only registered crew member aboard."),
+    "opensurveillance.twentyFourCamerasOnline": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Several recordings were classified as ordinary crew movement, even though Luna is the only registered crew member aboard."),
     "opensurveillance.unregisteredMovement": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("A dark figure crosses Corridor B-12. One side carries Luna's posture and gait. The other drags behind it as liquid shadow."),
-    "opensurveillance.crewIdentitiesDetected2": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("The earlier recording is unmistakable. A figure wearing Luna's body walks through Engineering while her cryosleep biometrics remain active in the same timestamp.\n\nThe organism is passing the ship's identity checks."),
+    "opensurveillance.crewIdentitiesDetected2": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("The earlier recording is unmistakable. An uncanny figure looking almost exactly like Luna walks through Engineering..."),
 
     // FALSE GROUND CONTROL
     "runfalsegroundsequence.groundControl": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("The channel opens without the expected transmission delay.\n\n'Agent Luna H. Resume Earth approach immediately. Do not alter the landing corridor. Bring the vessel home.'"),
@@ -231,11 +231,11 @@ REBREATHER: ${formatRebreatherTime(state.rebreatherSeconds)}. Luna must open the
     "runlaboratorymontage.loadResidueSample": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("The chamber locks around the tube. Black material spreads over the inner glass and presses toward Luna's gloved hand. She withdraws it and initiates the scan."),
     "runlaboratorymontage.unknownBiologicalMaterial": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("The sample contains no stable cellular structure. Its molecules dismantle and rebuild themselves in response to the scanner. It is not merely alive. It is searching for a biological pattern.\n\nLuna: ‘You're trying to become something.’"),
     "runlaboratorymontage.adaptiveDnaMimicry": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("The organism has no fixed genome. It absorbs biological information and reconstructs itself from acquired DNA. The simulated strands begin aligning with a human sequence.\n\nLuna: ‘It can copy living things.’"),
-    "runlaboratorymontage.itStudiedHer": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("The residue has incorporated fragments of Luna's DNA. It has not merely touched her. It has studied her. The ship marks the potential completed template as HUMAN.\n\nLuna: ‘Even people.’"),
-    "runlaboratorymontage.howItCameAboard": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Trace minerals in the organism match the Alpha 9 extraction site. Dormant biological matter was concealed inside the recovered cores. It escaped during cryosleep, copied Luna's genetic signature and used her credentials to enter restricted systems.\n\nLuna: ‘That wasn't my access record. It was pretending to be me.’"),
-    "runlaboratorymontage.theFormBecomesPermanent": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("As the simulation completes, the organism's adaptive activity stops. Its cells lock into the copied biology. It cannot return to its fluid state. It does not wear the body. It becomes the body.\n\nTransformation is irreversible."),
-    "runlaboratorymontage.itCanDie": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("A completed human form requires oxygen. It develops circulation, permanent tissue and a finite tolerance for trauma. It can suffocate. It can bleed. It can die.\n\nLuna: ‘Once it becomes human, it becomes mortal.’"),
-    "runlaboratorymontage.emergencyLockdown": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("The scanner freezes. Every Laboratory light dies, then returns in red. Reinforced doors seal throughout the ship. The Security Armoury, tactical equipment bay and emergency weapons lockers disappear behind biometric lockdowns authorised under Luna's identity.\n\nThe organism knows she has discovered its weakness."),
+    "runlaboratorymontage.itStudiedHer": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("The residue has incorporated fragments of Luna's DNA. It has not merely touched her. It has studied her. The ship marks the potential completed sequence as human.\n\nLuna: ‘Even people.’"),
+    "runlaboratorymontage.howItCameAboard": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Trace minerals in the organism match the Alpha 9 extraction site. Dormant biological matter was concealed inside the recovered cores"),
+    "runlaboratorymontage.theFormBecomesPermanent": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("As the alien mimicks the DNA of the host, it becomes locked into its new form, essentially becoming human.\n\nTransformation is irreversible."),
+    "runlaboratorymontage.itCanDie": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("A completed human form requires oxygen. It develops circulation, permanent tissue and a heart. It can suffocate. It can bleed. It can die.\n\nLuna: ‘Once it becomes human, it becomes mortal.’"),
+    "runlaboratorymontage.emergencyLockdown": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("The scanner freezes. Every Laboratory light dies, then turns red. Reinforced doors seal throughout the ship. The Security Armoury, tactical equipment bay and emergency weapons lockers disappear behind locked doors."),
 
     // FINAL REPORT
     "finalisebranch.commandNodeIsolated": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Closing secondary routes and acquiring the Earth relay"),
