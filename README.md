@@ -35,3 +35,6 @@ A cinematic solo science-fiction survival demo by **James Ritchie**. This build 
 4. Launch the new Home Screen icon once while still online.
 5. Test in Airplane Mode.
 
+## Debris Field mini-game
+
+The title menu now includes **The Void: Debris Field Mini-game**. Its files live in `debris-field/` and its transparent gameplay assets are `assets/IMGA1.png` through `assets/IMGA4.png`. The results screen returns to the main title.

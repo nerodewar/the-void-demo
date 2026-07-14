@@ -10,6 +10,9 @@ const CORE_ASSETS = [
   "./ground-control-terminal.js",
   "./pwa.js",
   "./manifest.webmanifest",
+  "./debris-field/index.html",
+  "./debris-field/styles.css",
+  "./debris-field/game.js",
   "./assets/icons/icon-180.png",
   "./assets/icons/icon-192.png",
   "./assets/icons/icon-512.png",
@@ -25,12 +28,19 @@ const ALL_ASSETS = [
   "./ground-control-terminal.js",
   "./pwa.js",
   "./manifest.webmanifest",
+  "./debris-field/index.html",
+  "./debris-field/styles.css",
+  "./debris-field/game.js",
   "./assets/icons/icon-180.png",
   "./assets/icons/icon-192.png",
   "./assets/icons/icon-512.png",
   "./assets/icons/icon-1024.png",
   "./assets/icons/icon-maskable-512.png",
   "./assets/IMG00.png",
+  "./assets/IMGA1.png",
+  "./assets/IMGA2.png",
+  "./assets/IMGA3.png",
+  "./assets/IMGA4.png",
   "./assets/IMG01.png",
   "./assets/IMG02.png",
   "./assets/IMG03.png",
@@ -203,12 +213,15 @@ self.addEventListener("fetch", (event) => {
   if (event.request.mode === "navigate") {
     event.respondWith((async () => {
       const cache = await caches.open(CACHE_VERSION);
-      const indexUrl = scopedUrl("./index.html");
-      const cached = await cache.match(indexUrl, { ignoreSearch: true })
-        || await caches.match(indexUrl, { ignoreSearch: true });
+      const requestUrl = new URL(event.request.url);
+      const isDebrisField = requestUrl.pathname.includes("/debris-field");
+      const fallbackUrl = scopedUrl(isDebrisField ? "./debris-field/index.html" : "./index.html");
+      const cached = await cache.match(event.request, { ignoreSearch: true })
+        || await cache.match(fallbackUrl, { ignoreSearch: true })
+        || await caches.match(fallbackUrl, { ignoreSearch: true });
       try {
         const response = await fetch(event.request);
-        if (response.ok) cache.put(indexUrl, response.clone());
+        if (response.ok) cache.put(fallbackUrl, response.clone());
         return response;
       } catch {
         return cached || Response.error();

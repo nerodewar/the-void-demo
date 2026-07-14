@@ -1,11 +1,13 @@
-The Void Demo v1.0.4 Offline iPad PWA
+The Void Demo v1.0.5 Offline iPad PWA
 
-Launch-stability repair:
-- Full 142 MB offline archive now caches after launch instead of competing with Play.
-- Cache work pauses during the opening transition.
-- Existing cached media is reused after updates instead of downloaded again.
-- Old complete caches remain available until the replacement archive is ready.
-- Image preloads have a timeout and no longer await expensive decode operations.
-- Repeated Play taps are guarded against overlapping launches.
-- Installed PWAs automatically reload once when a new service worker takes control.
-- Ground Control terminal presentation remains enabled for all communication scenes.
+Debris Field integration:
+- Added “The Void: Debris Field Mini-game” to the main title menu.
+- Removed the mini-game tutorial/meteor score briefing page.
+- Mini-game begins immediately after its assets initialise.
+- Increased meteor pressure by 20% while preserving safe spawn spacing.
+- Added the supplied Cloudflare-hosted Proton music track.
+- Results screen returns directly to The Void main title.
+- Mini-game code and assets are included in the main offline archive.
+- Main campaign content and progression remain otherwise unchanged.
+
+Launch-stability repair retained from v1.0.4.

@@ -112,7 +112,7 @@ REBREATHER: ${formatRebreatherTime(state.rebreatherSeconds)}. Luna must open the
     "getroomdefinition.hallway2": ({ state = {}, clocks = "", checkpointText = "" } = {}) => (state.alienEncountered
           ? "The emergency lights no longer pulse in sequence. Somewhere inside the walls, a slick weight moves against the ship's direction of travel."
           : "The main hallway flashes amber. Smoke begins to drift in from the Life Support access door.\n\nThe Control Room branches away to the north. Life Support lies at the far end of the corridor."),
-    "getroomdefinition.controlRoom2": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Ground Control has frozen Luna's Earth approach and marked the vessel as a biological containment risk.\n\nThe relay stays open, but nobody speaks."),
+    "getroomdefinition.controlRoom2": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("The rest of the ship has vanished from the schematic. Only Control remains. Ground Control has frozen Luna's Earth approach and marked the vessel as a biological containment risk.\n\nThe relay stays open, but nobody speaks."),
     "getroomdefinition.controlRoom3": ({ state = {}, clocks = "", checkpointText = "" } = {}) => (state.engineRepaired
             ? "Luna reaches Control in darkness. The crisis carrier is still open. Ground Control has received the engine telemetry and is waiting for her report."
             : "The crisis signal has left the ship. Engine 02 has failed and needs repairing manually. The Main Engine Room lies to the south via the Maintenance Tunnels."),
@@ -170,7 +170,7 @@ REBREATHER: ${formatRebreatherTime(state.rebreatherSeconds)}. Luna must open the
 
     // SAT-NAV FAILURE
     "triggersatnavfailure.theEnginesAreNotTheProblem": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("The engines are stable. Before Luna can leave the console, the ship loses its position fix. Satellite navigation has failed and the Earth-return vector begins to drift."),
-    "triggersatnavfailure.theShipIsFlyingBlind": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Luna must return to Control before attempting the spacewalk."),
+    "triggersatnavfailure.theShipIsFlyingBlind": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("The schematic expands into a dangerous repair route: Engine Room, Maintenance Tunnels, Control, Airlock, Outer Hull, Satellite Array.\n\nLuna must return to Control before attempting the spacewalk."),
     "triggersatnavfailure.evaRouteConstructed": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Mapping Control, Airlock, Outer Hull and Satellite Navigation Array"),
 
     // SAT-NAV DIAGNOSIS
