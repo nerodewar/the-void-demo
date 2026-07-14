@@ -15,13 +15,13 @@
 
   const TEXT = {
     // INTRO CINEMATICS
-    "intro.opening": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Elite Forces Agent Luna H. is transporting a cache of irreplaceable resources from Alpha 9, a distant world beyond the mapped colonies.\n\n" +
+    "intro.opening": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Elite Forces Agent Luna H. is transporting a cache of precious super-conductors from Alpha 9, a distant world beyond the stars.\n\n" +
         "It is her first solo mission through deep space.\n\n" +
         "With Earth still seventy-two hours away, Luna has crossed the last navigational threshold before home.\n\n" +
         "A silent, uncharted expanse known as The Void."),
-    "intro.emergencyWake": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("The fire alarm tears Luna out of cryosleep.\n\n" +
-        "Emergency red floods the chamber. Somewhere beyond the sealed glass, a system is burning, though the ship reports no impact and no mechanical fault.\n\n" +
-        "Still disoriented, Luna releases the pod seals and goes to investigate."),
+    "intro.emergencyWake": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("The fire alarm sounds, waking up Luna out of cryosleep.\n\n" +
+        "Emergency lights flood the chamber. On board, a system is on fire, though the ship reports no impact and no mechanical fault.\n\n" +
+        "Still disoriented, Luna releases the sleep pod and goes to investigate."),
 
     // SYSTEM TRANSITIONS
     "startnewmission.missionArchiveInitialising": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Game loading..."),
@@ -39,12 +39,12 @@
     "entergame.deckCutawayOnline": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Begin the game..."),
 
     // ROOM NARRATIVE (all map states)
-    "getroomdefinition.controlRoom": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("The false Ground Control signal has collapsed into static. Luna seals the relay and checks the specimen jar at her belt. The black residue inside is still moving.\n\nThe Laboratory may be able to tell her what entered the ship, how it travelled here and whether it can be killed."),
-    "getroomdefinition.hallway": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Luna moves with the plasma gun raised and the residue sample secured against her suit. The ship is quiet again, but security indicators pulse under her own credentials."),
-    "getroomdefinition.lifeSupport": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("The oxygen bypass is holding. Luna crosses the compartment without slowing. The organism once opened this panel using her copied authorisation. The sample may explain how."),
-    "getroomdefinition.southHallway": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Black smears remain along the ceiling seams, but the movement has stopped. Laboratory 07 waits at the end of the corridor under cold blue light."),
-    "getroomdefinition.laboratory": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("The Laboratory is exactly as Luna left it: sterile, silent and powered by cold blue emergency strips. She locks the door behind her and places the specimen beside the molecular analysis chamber.\n\nInside the jar, the residue stretches toward the scanner light."),
-    "getroomdefinition.laboratory2": ({ state = {}, clocks = "", checkpointText = "" } = {}) => (`Reinforced doors have sealed throughout the ship under Luna's copied biometric authority. ${clocks}
+    "getroomdefinition.controlRoom": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("The signal turns into static. Luna still has the specimen jar of black residue from the mess hall.\n\nThe Laboratory may be able to tell her more about it"),
+    "getroomdefinition.hallway": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Luna moves towards the through the hallway. it is eerily quiet..."),
+    "getroomdefinition.lifeSupport": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("The oxygen bypass is holding. The sample may explain how it tampered with the life support systems..."),
+    "getroomdefinition.southHallway": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Black smears remain on the ceiling and walls... Laboratory 07 waits at the end of the corridor under cool, blue light..."),
+    "getroomdefinition.laboratory": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("The Laboratory is sterile and silent. Luna locks the door behind her and places the specimen beside the molecular analysis unit.\n\nInside the jar, the residue stretches toward the scanner light."),
+    "getroomdefinition.laboratory2": ({ state = {}, clocks = "", checkpointText = "" } = {}) => (`The thing has sesled the doors throughout the spacecraft... ${clocks}
 
 The ship cannot keep Luna alive until Earth arrival. She must breach the South Hall, seize Security Control and reach the tactical oxygen supply before the reserve fails.`),
     "getroomdefinition.southHallBlastDoor": ({ state = {}, clocks = "", checkpointText = "" } = {}) => (state.southHallUnlocked
