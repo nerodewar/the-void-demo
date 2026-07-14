@@ -10,10 +10,10 @@
     shieldRechargeSeconds: 3.4,
     engineOfflineSeconds: 4.1,
     postOutageShieldDelay: 0.7,
-    maxMeteors: 12,
-    spawnRateMultiplier: 1.2,
+    maxMeteors: 20,
+    spawnRateMultiplier: 1.7,
     starCount: 150,
-    scoreThresholds: { twoStars: 26000, threeStars: 56000 },
+    scoreThresholds: { twoStars: 34000, threeStars: 75000 },
     meteorTypes: [
       { id: 'small', image: 'IMGA1', weight: 0.57, hp: 1, points: 10, minSize: 48, maxSize: 70, speed: 1.02 },
       { id: 'medium', image: 'IMGA2', weight: 0.30, hp: 3, points: 35, minSize: 88, maxSize: 124, speed: 0.83 },
