@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#020711">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Debris Field">
+  <title>The Void: Debris Field Mini-game</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <audio id="debris-music" src="https://pub-fcb7451138fa4bf39b6e0d6f01a687a6.r2.dev/My%20Song%2063%20(Proton)%20mastered%20loud.wav" preload="metadata" loop aria-hidden="true"></audio>
+
+  <main id="game-shell" aria-label="The Void debris field mini-game">
+    <canvas id="game-canvas" aria-label="Debris field game area"></canvas>
+
+    <div id="hud" aria-hidden="true">
+      <section class="pilot-cluster hud-panel">
+        <img id="pilot-image" src="../assets/IMG00.png" alt="Luna">
+        <div class="pilot-readouts">
+          <div class="readout-label"><span>DEFENCE FIELD</span><strong id="shield-label">READY</strong></div>
+          <div class="segmented-meter" id="shield-meter"></div>
+          <div class="readout-label heat-label"><span>LASER HEAT</span><strong id="heat-label">0%</strong></div>
+          <div class="segmented-meter heat-meter" id="heat-meter"></div>
+        </div>
+      </section>
+
+      <section class="warning-banner">
+        <span class="warning-icon"><b>!</b></span>
+        <div><h1>DEBRIS FIELD</h1><p>MANUAL PILOTING REQUIRED</p></div>
+      </section>
+
+      <section class="radar-panel hud-panel">
+        <h2>COLLISION COURSE</h2>
+        <div class="radar">
+          <i></i><i></i><i></i><b class="radar-blip one"></b><b class="radar-blip two"></b>
+        </div>
+        <p>TIME REMAINING</p>
+        <strong id="timer">02:00.00</strong>
+      </section>
+
+      <section class="objective-panel hud-panel">
+        <h2>OBJECTIVE</h2>
+        <p>REACH 50 LIGHT YEARS</p>
+        <p>OBLITERATE METEORITES</p>
+        <dl>
+          <div><dt>DISTANCE</dt><dd id="distance">0.0 LY</dd></div>
+          <div><dt>OBLITERATED</dt><dd id="kills">0</dd></div>
+          <div><dt>SCORE</dt><dd id="combat-score">0</dd></div>
+        </dl>
+      </section>
+
+      <div id="status-toast" role="status" aria-live="polite"></div>
+
+      <section class="steer-control control-zone" aria-label="Steering controls">
+        <div class="dpad-ring">
+          <button class="control-button up" data-control="up" aria-label="Steer up">▲</button>
+          <button class="control-button left" data-control="left" aria-label="Steer left">◀</button>
+          <span class="dpad-core"></span>
+          <button class="control-button right" data-control="right" aria-label="Steer right">▶</button>
+          <button class="control-button down" data-control="down" aria-label="Steer down">▼</button>
+        </div>
+        <span class="control-caption">STEER</span>
+      </section>
+
+      <section class="fire-control control-zone" aria-label="Weapon control">
+        <button id="fire-button" class="fire-button" aria-label="Hold to fire">FIRE</button>
+        <span class="control-caption">HOLD TO FIRE</span>
+      </section>
+
+      <section class="bottom-strip hud-panel">
+        <div><span>VELOCITY</span><b id="velocity-bars" class="mini-bars"></b><strong id="velocity">1,350 M/S</strong></div>
+        <div><span>ENGINE</span><b id="engine-bars" class="mini-bars"></b><strong id="engine-state">NOMINAL</strong></div>
+        <div><span>SYSTEMS</span><b class="mini-bars fixed"></b><strong>ONLINE</strong></div>
+      </section>
+    </div>
+
+    <section id="loading-screen" class="full-overlay active">
+      <div class="overlay-card">
+        <span class="eyebrow">THE VOID / FLIGHT SYSTEM</span>
+        <h2>INITIALISING MISSION ARCHIVE</h2>
+        <div class="loading-track"><i id="loading-progress"></i></div>
+        <p id="loading-copy">Loading flight assets…</p>
+      </div>
+    </section>
+
+    <section id="result-screen" class="full-overlay">
+      <div class="overlay-card result-card">
+        <span class="eyebrow">MISSION PERFORMANCE</span>
+        <h2 id="result-title">SECTOR CLEARED</h2>
+        <div id="stars" class="stars" aria-label="Star rating">★ ★ ★</div>
+        <p id="result-narrative"></p>
+        <div class="result-grid">
+          <div><span>DISTANCE</span><strong id="result-distance">0.0 LY</strong></div>
+          <div><span>OBLITERATION SCORE</span><strong id="result-combat">0</strong></div>
+          <div><span>OVERALL SCORE</span><strong id="result-overall">0</strong></div>
+          <div><span>ENGINE OUTAGES</span><strong id="result-outages">0</strong></div>
+        </div>
+        <div class="result-actions">
+          <button id="restart-button" class="secondary-button">RETRY SEQUENCE</button>
+          <button id="continue-button" class="primary-button">RETURN TO MAIN TITLE</button>
+        </div>
+      </div>
+    </section>
+
+    <div id="orientation-message">
+      <div><strong>ROTATE DEVICE</strong><span>This flight module is designed for landscape play.</span></div>
+    </div>
+  </main>
+  <script src="game.js" defer></script>
+</body>
+</html>
