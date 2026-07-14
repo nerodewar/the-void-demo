@@ -77,7 +77,7 @@ REBREATHER: ${formatRebreatherTime(state.rebreatherSeconds)}. Luna must open the
             ? "White light rolls through the corridor one fixture at a time. The grid stabilises. Whatever Luna struck with the plasma gun has retreated into the walls."
             : state.relayFound
               ? "The recovered relay is ready for installation, but wet movement is closing through the corridor. Luna must deal with the organism first."
-              : "The junction reports one absent module: the main power relay. There is a replacement relay in storage
+              : "The junction reports one absent module: the main power relay. There is a replacement relay in storage."),
     "getroomdefinition.darkCorridor": ({ state = {}, clocks = "", checkpointText = "" } = {}) => (!state.alienRepelled
             ? "The organism closes across the corridor before Luna can reach Storage. It feels along the walls toward her, recoiling whenever the flashlight crosses its face. She has no time to search. She must hide now or face it with the plasma gun already in her hand."
             : state.relayFound
