@@ -1,4 +1,4 @@
-The Void Demo v1.1.1 Offline iPad PWA
+The Void Demo v1.1.2 Offline iPad PWA
 
 Hunt Mode update:
 - Added HUNT 01: ENGINE KILL to the full game's main title menu.
@@ -15,3 +15,12 @@ Hunt Mode update:
 All previous Chapter One, sat-nav route, offline PWA, Debris Field, narrative, audio and checkpoint fixes are retained.
 
 HOTFIX: Hunt 01 title-menu entry is now a direct HTML link and code assets use network-first updates.
+
+
+HUNT 01 CONTROL/PRESENTATION UPDATE:
+- Dedicated FIRE button above the movement stick.
+- Holding FIRE plants Luna in place while the right stick remains aim-only.
+- Removed large room labels from the playable SVG floor.
+- Added subtle fading room-entry titles beneath the mission timer.
+- Disabled long-press selection, image dragging, touch callouts and tap highlighting in Hunt 01.
+- Offline service-worker cache updated to v1.2.2.
