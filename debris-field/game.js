@@ -18,8 +18,8 @@
     starCount: 150,
 
     scoreThresholds: {
-      twoStars: 26000,
-      threeStars: 56000
+      twoStars: 75000,
+      threeStars: 125000
     },
 
     meteorTypes: [
