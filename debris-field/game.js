@@ -10,13 +10,18 @@
     shieldRechargeSeconds: 3.4,
     engineOfflineSeconds: 4.1,
     postOutageShieldDelay: 0.7,
-    maxMeteors: 20,
-    spawnRateMultiplier: 2.0,
+
+    // Additional 20% difficulty increase.
+    maxMeteors: 14,
+    spawnRateMultiplier: 1.44,
+
     starCount: 150,
+
     scoreThresholds: {
-      twoStars: 100000,
-      threeStars: 150000
+      twoStars: 26000,
+      threeStars: 56000
     },
+
     meteorTypes: [
       {
         id: 'small',
@@ -82,7 +87,9 @@
   }
 
   async function startFlightMusic() {
-    if (!flightMusic || !flightMusic.paused) return true;
+    if (!flightMusic || !flightMusic.paused) {
+      return true;
+    }
 
     flightMusic.volume = 0.52;
     flightMusic.loop = true;
@@ -107,27 +114,36 @@
   const ui = {
     loading: $('#loading-screen'),
     result: $('#result-screen'),
+
     loadingProgress: $('#loading-progress'),
     loadingCopy: $('#loading-copy'),
+
     restart: $('#restart-button'),
     continue: $('#continue-button'),
+
     timer: $('#timer'),
     distance: $('#distance'),
     kills: $('#kills'),
     combatScore: $('#combat-score'),
+
     shieldLabel: $('#shield-label'),
     heatLabel: $('#heat-label'),
     shieldMeter: $('#shield-meter'),
     heatMeter: $('#heat-meter'),
+
     velocity: $('#velocity'),
     velocityBars: $('#velocity-bars'),
     engineBars: $('#engine-bars'),
     engineState: $('#engine-state'),
+
+    steerPad: $('.dpad-ring'),
     fireButton: $('#fire-button'),
     toast: $('#status-toast'),
+
     resultTitle: $('#result-title'),
     stars: $('#stars'),
     resultNarrative: $('#result-narrative'),
+
     resultDistance: $('#result-distance'),
     resultCombat: $('#result-combat'),
     resultOverall: $('#result-overall'),
@@ -136,6 +152,12 @@
 
   const assets = {};
 
+  /*
+   * Keyboard controls remain digital.
+   *
+   * The iPad steering pad uses a separate analogue vector. This prevents
+   * steering from snapping permanently to full left or full right.
+   */
   const controls = {
     up: false,
     down: false,
@@ -144,49 +166,26 @@
     fire: false
   };
 
-  /*
-   * Stores every currently active touchscreen or pointer control.
-   *
-   * This prevents a lost pointerup event from leaving FIRE or a movement
-   * direction permanently held.
-   */
-  const activeControlPointers = new Map();
+  const joystickAxis = {
+    x: 0,
+    y: 0
+  };
 
+  /*
+   * Each touchscreen control owns exactly one pointer.
+   *
+   * The steering finger and FIRE finger are therefore tracked separately,
+   * which makes simultaneous movement and firing reliable on iPad.
+   */
+  const inputPointers = {
+    steer: null,
+    fire: null
+  };
+
+  let touchFireHeld = false;
+  let keyboardFireHeld = false;
   let game = null;
   let toastTimer = 0;
-
-  function releaseControlPointer(pointerId) {
-    const binding = activeControlPointers.get(pointerId);
-
-    if (!binding) return;
-
-    activeControlPointers.delete(pointerId);
-
-    const controlStillHeld = [...activeControlPointers.values()]
-      .some((item) => item.key === binding.key);
-
-    const buttonStillHeld = [...activeControlPointers.values()]
-      .some((item) => item.button === binding.button);
-
-    controls[binding.key] = controlStillHeld;
-
-    binding.button.classList.toggle(
-      'pressed',
-      buttonStillHeld
-    );
-  }
-
-  function releaseAllControls() {
-    activeControlPointers.clear();
-
-    Object.keys(controls).forEach((key) => {
-      controls[key] = false;
-    });
-
-    document.querySelectorAll('.pressed').forEach((node) => {
-      node.classList.remove('pressed');
-    });
-  }
 
   function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
@@ -200,79 +199,367 @@
     return Math.random() * (max - min) + min;
   }
 
-  function formatTime(seconds) {
-    const safe = Math.max(0, seconds);
-    const mins = Math.floor(safe / 60);
-    const secs = Math.floor(safe % 60);
-    const hundredths = Math.floor((safe % 1) * 100);
+  function syncFireState() {
+    controls.fire = keyboardFireHeld || touchFireHeld;
 
-    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}.${String(hundredths).padStart(2, '0')}`;
+    ui.fireButton?.classList.toggle(
+      'pressed',
+      controls.fire
+    );
+  }
+
+  function updateDirectionVisuals() {
+    const leftActive =
+      controls.left ||
+      joystickAxis.x < -0.16;
+
+    const rightActive =
+      controls.right ||
+      joystickAxis.x > 0.16;
+
+    const upActive =
+      controls.up ||
+      joystickAxis.y < -0.16;
+
+    const downActive =
+      controls.down ||
+      joystickAxis.y > 0.16;
+
+    document
+      .querySelector('[data-control="left"]')
+      ?.classList.toggle(
+        'pressed',
+        leftActive
+      );
+
+    document
+      .querySelector('[data-control="right"]')
+      ?.classList.toggle(
+        'pressed',
+        rightActive
+      );
+
+    document
+      .querySelector('[data-control="up"]')
+      ?.classList.toggle(
+        'pressed',
+        upActive
+      );
+
+    document
+      .querySelector('[data-control="down"]')
+      ?.classList.toggle(
+        'pressed',
+        downActive
+      );
+  }
+
+  function clearJoystick() {
+    joystickAxis.x = 0;
+    joystickAxis.y = 0;
+
+    updateDirectionVisuals();
+  }
+
+  function updateJoystick(event) {
+    if (!ui.steerPad) {
+      return;
+    }
+
+    const rect =
+      ui.steerPad.getBoundingClientRect();
+
+    const centreX =
+      rect.left + rect.width / 2;
+
+    const centreY =
+      rect.top + rect.height / 2;
+
+    const radius = Math.max(
+      1,
+      Math.min(
+        rect.width,
+        rect.height
+      ) / 2
+    );
+
+    const rawX =
+      (event.clientX - centreX) /
+      radius;
+
+    const rawY =
+      (event.clientY - centreY) /
+      radius;
+
+    const magnitude =
+      Math.hypot(rawX, rawY);
+
+    /*
+     * A sizeable central dead zone prevents tiny thumb movements from
+     * causing unwanted steering.
+     */
+    const deadZone = 0.22;
+
+    if (magnitude <= deadZone) {
+      clearJoystick();
+      return;
+    }
+
+    const directionX =
+      rawX / magnitude;
+
+    const directionY =
+      rawY / magnitude;
+
+    /*
+     * Movement gradually increases from zero at the edge of the dead zone
+     * to full speed at the outer edge of the joystick.
+     */
+    const scaledMagnitude = clamp(
+      (
+        Math.min(magnitude, 1) -
+        deadZone
+      ) /
+      (
+        1 -
+        deadZone
+      ),
+      0,
+      1
+    );
+
+    joystickAxis.x =
+      directionX *
+      scaledMagnitude;
+
+    joystickAxis.y =
+      directionY *
+      scaledMagnitude;
+
+    updateDirectionVisuals();
+  }
+
+  function releaseJoystick() {
+    const pointerId =
+      inputPointers.steer;
+
+    inputPointers.steer = null;
+
+    clearJoystick();
+
+    if (
+      pointerId !== null &&
+      ui.steerPad?.hasPointerCapture?.(
+        pointerId
+      )
+    ) {
+      try {
+        ui.steerPad.releasePointerCapture(
+          pointerId
+        );
+      } catch {
+        /*
+         * Safari may already have released the pointer.
+         * The internal steering state has still been cleared.
+         */
+      }
+    }
+  }
+
+  function releaseFire() {
+    const pointerId =
+      inputPointers.fire;
+
+    inputPointers.fire = null;
+    touchFireHeld = false;
+
+    syncFireState();
+
+    if (
+      pointerId !== null &&
+      ui.fireButton?.hasPointerCapture?.(
+        pointerId
+      )
+    ) {
+      try {
+        ui.fireButton.releasePointerCapture(
+          pointerId
+        );
+      } catch {
+        /*
+         * Safari may already have released the pointer.
+         * The internal FIRE state has still been cleared.
+         */
+      }
+    }
+  }
+
+  function releaseAllControls() {
+    releaseJoystick();
+    releaseFire();
+
+    controls.up = false;
+    controls.down = false;
+    controls.left = false;
+    controls.right = false;
+
+    keyboardFireHeld = false;
+    touchFireHeld = false;
+
+    syncFireState();
+    updateDirectionVisuals();
+
+    document
+      .querySelectorAll('.pressed')
+      .forEach((node) => {
+        node.classList.remove('pressed');
+      });
+  }
+
+  function formatTime(seconds) {
+    const safe =
+      Math.max(0, seconds);
+
+    const mins =
+      Math.floor(safe / 60);
+
+    const secs =
+      Math.floor(safe % 60);
+
+    const hundredths =
+      Math.floor(
+        (safe % 1) * 100
+      );
+
+    return (
+      `${String(mins).padStart(2, '0')}:` +
+      `${String(secs).padStart(2, '0')}.` +
+      `${String(hundredths).padStart(2, '0')}`
+    );
   }
 
   function buildMeter(element) {
     element.replaceChildren();
 
-    for (let i = 0; i < 12; i += 1) {
-      element.append(document.createElement('i'));
+    for (
+      let i = 0;
+      i < 12;
+      i += 1
+    ) {
+      element.append(
+        document.createElement('i')
+      );
     }
   }
 
-  function setMeter(element, ratio, warnFrom = 2) {
-    const lit = Math.round(clamp(ratio, 0, 1) * 12);
+  function setMeter(
+    element,
+    ratio,
+    warnFrom = 2
+  ) {
+    const lit =
+      Math.round(
+        clamp(ratio, 0, 1) *
+        12
+      );
 
-    [...element.children].forEach((segment, index) => {
-      segment.className = '';
+    [...element.children].forEach(
+      (segment, index) => {
+        segment.className = '';
 
-      if (index < lit) {
-        segment.classList.add(
-          index >= 12 - warnFrom ? 'warn' : 'on'
-        );
+        if (index < lit) {
+          segment.classList.add(
+            index >= 12 - warnFrom
+              ? 'warn'
+              : 'on'
+          );
+        }
       }
-    });
+    );
   }
 
-  function showToast(text, danger = false, duration = 1500) {
+  function showToast(
+    text,
+    danger = false,
+    duration = 1500
+  ) {
     clearTimeout(toastTimer);
 
     ui.toast.textContent = text;
-    ui.toast.classList.toggle('danger', danger);
+
+    ui.toast.classList.toggle(
+      'danger',
+      danger
+    );
+
     ui.toast.classList.add('show');
 
-    toastTimer = setTimeout(() => {
-      ui.toast.classList.remove('show');
-    }, duration);
+    toastTimer = setTimeout(
+      () => {
+        ui.toast.classList.remove(
+          'show'
+        );
+      },
+      duration
+    );
   }
 
-  function loadImage(key, src, index, total) {
-    return new Promise((resolve, reject) => {
-      const image = new Image();
+  function loadImage(
+    key,
+    src,
+    index,
+    total
+  ) {
+    return new Promise(
+      (resolve, reject) => {
+        const image = new Image();
 
-      image.decoding = 'async';
+        image.decoding = 'async';
 
-      image.onload = () => {
-        assets[key] = image;
+        image.onload = () => {
+          assets[key] = image;
 
-        ui.loadingProgress.style.width =
-          `${Math.round(((index + 1) / total) * 100)}%`;
+          ui.loadingProgress.style.width =
+            `${Math.round(
+              (
+                (index + 1) /
+                total
+              ) *
+              100
+            )}%`;
 
-        ui.loadingCopy.textContent = `Loading ${key}…`;
+          ui.loadingCopy.textContent =
+            `Loading ${key}…`;
 
-        resolve();
-      };
+          resolve();
+        };
 
-      image.onerror = () => {
-        reject(new Error(`Unable to load ${src}`));
-      };
+        image.onerror = () => {
+          reject(
+            new Error(
+              `Unable to load ${src}`
+            )
+          );
+        };
 
-      image.src = src;
-    });
+        image.src = src;
+      }
+    );
   }
 
   async function preload() {
-    const entries = Object.entries(ASSET_PATHS);
+    const entries =
+      Object.entries(
+        ASSET_PATHS
+      );
 
-    for (let i = 0; i < entries.length; i += 1) {
-      const [key, src] = entries[i];
+    for (
+      let i = 0;
+      i < entries.length;
+      i += 1
+    ) {
+      const [key, src] =
+        entries[i];
 
       await loadImage(
         key,
@@ -282,43 +569,91 @@
       );
     }
 
-    ui.loadingCopy.textContent = 'Flight systems online.';
+    ui.loadingCopy.textContent =
+      'Flight systems online.';
   }
 
   class Star {
-    constructor(width, height, initial = false) {
-      this.reset(width, height, initial);
+    constructor(
+      width,
+      height,
+      initial = false
+    ) {
+      this.reset(
+        width,
+        height,
+        initial
+      );
     }
 
-    reset(width, height, initial = false) {
-      this.x = random(0, width);
+    reset(
+      width,
+      height,
+      initial = false
+    ) {
+      this.x =
+        random(0, width);
+
       this.y = initial
         ? random(0, height)
-        : random(-height * 0.2, 0);
+        : random(
+            -height * 0.2,
+            0
+          );
 
-      this.z = random(0.3, 1.15);
-      this.length = random(5, 19) * this.z;
-      this.opacity = random(0.35, 1);
+      this.z =
+        random(0.3, 1.15);
+
+      this.length =
+        random(5, 19) *
+        this.z;
+
+      this.opacity =
+        random(0.35, 1);
     }
 
-    update(dt, speed, width, height) {
-      this.y += speed * this.z * dt;
+    update(
+      dt,
+      speed,
+      width,
+      height
+    ) {
+      this.y +=
+        speed *
+        this.z *
+        dt;
 
-      if (this.y > height + 30) {
-        this.reset(width, height, false);
+      if (
+        this.y >
+        height + 30
+      ) {
+        this.reset(
+          width,
+          height,
+          false
+        );
       }
     }
 
-    draw(ctx2d, speedScale) {
+    draw(
+      ctx2d,
+      speedScale
+    ) {
       const trail =
-        this.length * (0.65 + speedScale * 0.55);
+        this.length *
+        (
+          0.65 +
+          speedScale *
+          0.55
+        );
 
-      const gradient = ctx2d.createLinearGradient(
-        this.x,
-        this.y - trail,
-        this.x,
-        this.y
-      );
+      const gradient =
+        ctx2d.createLinearGradient(
+          this.x,
+          this.y - trail,
+          this.x,
+          this.y
+        );
 
       gradient.addColorStop(
         0,
@@ -330,12 +665,27 @@
         `rgba(190,230,255,${this.opacity})`
       );
 
-      ctx2d.strokeStyle = gradient;
-      ctx2d.lineWidth = Math.max(0.65, this.z * 1.55);
+      ctx2d.strokeStyle =
+        gradient;
+
+      ctx2d.lineWidth =
+        Math.max(
+          0.65,
+          this.z * 1.55
+        );
 
       ctx2d.beginPath();
-      ctx2d.moveTo(this.x, this.y - trail);
-      ctx2d.lineTo(this.x, this.y);
+
+      ctx2d.moveTo(
+        this.x,
+        this.y - trail
+      );
+
+      ctx2d.lineTo(
+        this.x,
+        this.y
+      );
+
       ctx2d.stroke();
     }
   }
@@ -350,7 +700,9 @@
     }
 
     update(dt) {
-      this.y -= this.speed * dt;
+      this.y -=
+        this.speed *
+        dt;
 
       if (this.y < -50) {
         this.dead = true;
@@ -358,12 +710,13 @@
     }
 
     draw(ctx2d) {
-      const gradient = ctx2d.createLinearGradient(
-        this.x,
-        this.y + 18,
-        this.x,
-        this.y - 18
-      );
+      const gradient =
+        ctx2d.createLinearGradient(
+          this.x,
+          this.y + 18,
+          this.x,
+          this.y - 18
+        );
 
       gradient.addColorStop(
         0,
@@ -380,14 +733,25 @@
         '#eaf9ff'
       );
 
-      ctx2d.strokeStyle = gradient;
+      ctx2d.strokeStyle =
+        gradient;
+
       ctx2d.lineWidth = 4;
       ctx2d.shadowColor = '#178fff';
       ctx2d.shadowBlur = 13;
 
       ctx2d.beginPath();
-      ctx2d.moveTo(this.x, this.y + 18);
-      ctx2d.lineTo(this.x, this.y - 15);
+
+      ctx2d.moveTo(
+        this.x,
+        this.y + 18
+      );
+
+      ctx2d.lineTo(
+        this.x,
+        this.y - 15
+      );
+
       ctx2d.stroke();
 
       ctx2d.shadowBlur = 0;
@@ -395,28 +759,58 @@
   }
 
   class Meteor {
-    constructor(type, x, size, speed, rotation) {
+    constructor(
+      type,
+      x,
+      size,
+      speed,
+      rotation
+    ) {
       this.type = type;
       this.image = assets[type.image];
+
       this.x = x;
       this.y = -size * 0.75;
+
       this.size = size;
       this.radius = size * 0.37;
+
       this.speed = speed;
       this.rotation = rotation;
       this.spin = random(-0.58, 0.58);
+
       this.hp = type.hp;
       this.maxHp = type.hp;
+
       this.dead = false;
       this.hitFlash = 0;
     }
 
-    update(dt, speedScale, height) {
-      this.y += this.speed * speedScale * dt;
-      this.rotation += this.spin * dt;
-      this.hitFlash = Math.max(0, this.hitFlash - dt);
+    update(
+      dt,
+      speedScale,
+      height
+    ) {
+      this.y +=
+        this.speed *
+        speedScale *
+        dt;
 
-      if (this.y - this.size > height + 40) {
+      this.rotation +=
+        this.spin *
+        dt;
+
+      this.hitFlash =
+        Math.max(
+          0,
+          this.hitFlash - dt
+        );
+
+      if (
+        this.y -
+        this.size >
+        height + 40
+      ) {
         this.dead = true;
       }
     }
@@ -434,9 +828,20 @@
 
     draw(ctx2d) {
       ctx2d.save();
-      ctx2d.translate(this.x, this.y);
-      ctx2d.rotate(this.rotation);
-      ctx2d.globalAlpha = this.hitFlash > 0 ? 0.62 : 1;
+
+      ctx2d.translate(
+        this.x,
+        this.y
+      );
+
+      ctx2d.rotate(
+        this.rotation
+      );
+
+      ctx2d.globalAlpha =
+        this.hitFlash > 0
+          ? 0.62
+          : 1;
 
       ctx2d.drawImage(
         this.image,
@@ -447,10 +852,14 @@
       );
 
       if (this.hitFlash > 0) {
-        ctx2d.globalCompositeOperation = 'screen';
-        ctx2d.fillStyle = 'rgba(255,255,255,.72)';
+        ctx2d.globalCompositeOperation =
+          'screen';
+
+        ctx2d.fillStyle =
+          'rgba(255,255,255,.72)';
 
         ctx2d.beginPath();
+
         ctx2d.arc(
           0,
           0,
@@ -458,6 +867,7 @@
           0,
           Math.PI * 2
         );
+
         ctx2d.fill();
       }
 
@@ -467,26 +877,39 @@
         this.maxHp > 1 &&
         this.hp < this.maxHp
       ) {
-        const width = this.size * 0.62;
+        const width =
+          this.size *
+          0.62;
 
-        ctx2d.fillStyle = 'rgba(0,0,0,.55)';
+        ctx2d.fillStyle =
+          'rgba(0,0,0,.55)';
 
         ctx2d.fillRect(
           this.x - width / 2,
-          this.y - this.size * 0.57,
+          this.y -
+            this.size *
+            0.57,
           width,
           4
         );
 
         ctx2d.fillStyle =
-          this.hp / this.maxHp > 0.34
+          this.hp /
+          this.maxHp >
+          0.34
             ? '#30b7ff'
             : '#ff4c48';
 
         ctx2d.fillRect(
           this.x - width / 2,
-          this.y - this.size * 0.57,
-          width * (this.hp / this.maxHp),
+          this.y -
+            this.size *
+            0.57,
+          width *
+            (
+              this.hp /
+              this.maxHp
+            ),
           4
         );
       }
@@ -494,36 +917,72 @@
   }
 
   class Particle {
-    constructor(x, y, color, force = 1) {
-      const angle = random(0, Math.PI * 2);
-      const speed = random(60, 220) * force;
+    constructor(
+      x,
+      y,
+      color,
+      force = 1
+    ) {
+      const angle =
+        random(
+          0,
+          Math.PI * 2
+        );
+
+      const speed =
+        random(60, 220) *
+        force;
 
       this.x = x;
       this.y = y;
-      this.vx = Math.cos(angle) * speed;
-      this.vy = Math.sin(angle) * speed;
-      this.life = random(0.25, 0.72);
-      this.maxLife = this.life;
-      this.size = random(1.5, 5.5) * force;
+
+      this.vx =
+        Math.cos(angle) *
+        speed;
+
+      this.vy =
+        Math.sin(angle) *
+        speed;
+
+      this.life =
+        random(0.25, 0.72);
+
+      this.maxLife =
+        this.life;
+
+      this.size =
+        random(1.5, 5.5) *
+        force;
+
       this.color = color;
     }
 
     update(dt) {
       this.life -= dt;
-      this.x += this.vx * dt;
-      this.y += this.vy * dt;
+
+      this.x +=
+        this.vx *
+        dt;
+
+      this.y +=
+        this.vy *
+        dt;
+
       this.vx *= 0.985;
       this.vy *= 0.985;
     }
 
     draw(ctx2d) {
-      ctx2d.globalAlpha = clamp(
-        this.life / this.maxLife,
-        0,
-        1
-      );
+      ctx2d.globalAlpha =
+        clamp(
+          this.life /
+            this.maxLife,
+          0,
+          1
+        );
 
-      ctx2d.fillStyle = this.color;
+      ctx2d.fillStyle =
+        this.color;
 
       ctx2d.fillRect(
         this.x,
@@ -541,28 +1000,38 @@
       this.running = false;
       this.finished = false;
       this.lastTime = 0;
-      this.timeLeft = CONFIG.duration;
+
+      this.timeLeft =
+        CONFIG.duration;
+
       this.elapsed = 0;
       this.distance = 0;
+
       this.killScore = 0;
       this.kills = 0;
       this.impacts = 0;
       this.engineOutages = 0;
+
       this.shieldReady = true;
       this.shieldRecharge = 0;
+
       this.engineOffline = false;
       this.engineOfflineTimer = 0;
       this.engineSide = 'LEFT';
+
       this.heat = 0;
       this.overheated = false;
       this.fireCooldown = 0;
+
       this.spawnTimer = 1;
       this.waveGap = 0;
       this.shake = 0;
+
       this.stars = [];
       this.meteors = [];
       this.lasers = [];
       this.particles = [];
+
       this.result = null;
 
       this.resize();
@@ -590,22 +1059,39 @@
     }
 
     resize() {
-      const rect = canvas.getBoundingClientRect();
-      const dpr = Math.min(
-        window.devicePixelRatio || 1,
-        2
-      );
+      const rect =
+        canvas.getBoundingClientRect();
 
-      this.width = Math.max(1, rect.width);
-      this.height = Math.max(1, rect.height);
+      const dpr =
+        Math.min(
+          window.devicePixelRatio ||
+            1,
+          2
+        );
 
-      canvas.width = Math.floor(
-        this.width * dpr
-      );
+      this.width =
+        Math.max(
+          1,
+          rect.width
+        );
 
-      canvas.height = Math.floor(
-        this.height * dpr
-      );
+      this.height =
+        Math.max(
+          1,
+          rect.height
+        );
+
+      canvas.width =
+        Math.floor(
+          this.width *
+          dpr
+        );
+
+      canvas.height =
+        Math.floor(
+          this.height *
+          dpr
+        );
 
       ctx.setTransform(
         dpr,
@@ -616,44 +1102,57 @@
         0
       );
 
-      this.playLeft = Math.max(
-        205,
-        this.width * 0.16
-      );
+      this.playLeft =
+        Math.max(
+          205,
+          this.width *
+          0.16
+        );
 
-      this.playRight = Math.min(
-        this.width - 205,
-        this.width * 0.84
-      );
+      this.playRight =
+        Math.min(
+          this.width - 205,
+          this.width *
+          0.84
+        );
 
-      this.playTop = Math.max(
-        110,
-        this.height * 0.13
-      );
+      this.playTop =
+        Math.max(
+          110,
+          this.height *
+          0.13
+        );
 
       this.playBottom =
         this.height -
         Math.max(
           70,
-          this.height * 0.10
+          this.height *
+          0.10
         );
 
       if (this.ship) {
-        this.ship.x = clamp(
-          this.ship.x,
-          this.playLeft +
-            this.ship.width / 2,
-          this.playRight -
-            this.ship.width / 2
-        );
+        this.ship.x =
+          clamp(
+            this.ship.x,
+            this.playLeft +
+              this.ship.width /
+              2,
+            this.playRight -
+              this.ship.width /
+              2
+          );
 
-        this.ship.y = clamp(
-          this.ship.y,
-          this.playTop +
-            this.ship.height / 2,
-          this.playBottom -
-            this.ship.height / 2
-        );
+        this.ship.y =
+          clamp(
+            this.ship.y,
+            this.playTop +
+              this.ship.height /
+              2,
+            this.playBottom -
+              this.ship.height /
+              2
+          );
       }
     }
 
@@ -662,21 +1161,30 @@
 
       this.running = true;
       this.finished = false;
-      this.lastTime = performance.now();
-      this.timeLeft = CONFIG.duration;
+      this.lastTime =
+        performance.now();
+
+      this.timeLeft =
+        CONFIG.duration;
+
       this.elapsed = 0;
       this.distance = 0;
+
       this.killScore = 0;
       this.kills = 0;
       this.impacts = 0;
       this.engineOutages = 0;
+
       this.shieldReady = true;
       this.shieldRecharge = 0;
+
       this.engineOffline = false;
       this.engineOfflineTimer = 0;
+
       this.heat = 0;
       this.overheated = false;
       this.fireCooldown = 0;
+
       this.spawnTimer = 0.71;
       this.waveGap = 0;
 
@@ -684,27 +1192,49 @@
       this.lasers.length = 0;
       this.particles.length = 0;
 
-      this.ship.x = this.width * 0.5;
-      this.ship.y = this.height * 0.79;
+      this.ship.x =
+        this.width *
+        0.5;
 
-      ui.result.classList.remove('active');
-      ui.loading.classList.remove('active');
+      this.ship.y =
+        this.height *
+        0.79;
+
+      ui.result.classList.remove(
+        'active'
+      );
+
+      ui.loading.classList.remove(
+        'active'
+      );
 
       startFlightMusic();
-      showToast('MANUAL CONTROL ENGAGED');
 
-      requestAnimationFrame((time) => {
-        this.frame(time);
-      });
+      showToast(
+        'MANUAL CONTROL ENGAGED'
+      );
+
+      requestAnimationFrame(
+        (time) => {
+          this.frame(time);
+        }
+      );
     }
 
     frame(time) {
-      if (!this.running) return;
+      if (!this.running) {
+        return;
+      }
 
-      const dt = Math.min(
-        (time - this.lastTime) / 1000,
-        0.035
-      );
+      const dt =
+        Math.min(
+          (
+            time -
+            this.lastTime
+          ) /
+          1000,
+          0.035
+        );
 
       this.lastTime = time;
 
@@ -712,9 +1242,11 @@
       this.draw();
 
       if (this.running) {
-        requestAnimationFrame((next) => {
-          this.frame(next);
-        });
+        requestAnimationFrame(
+          (next) => {
+            this.frame(next);
+          }
+        );
       }
     }
 
@@ -723,15 +1255,18 @@
       this.timeLeft -= dt;
 
       const speedMultiplier =
-        this.engineOffline ? 0.45 : 1;
+        this.engineOffline
+          ? 0.45
+          : 1;
 
-      this.distance = Math.min(
-        CONFIG.targetDistance,
-        this.distance +
-          CONFIG.baseLightYearsPerSecond *
+      this.distance =
+        Math.min(
+          CONFIG.targetDistance,
+          this.distance +
+            CONFIG.baseLightYearsPerSecond *
             speedMultiplier *
             dt
-      );
+        );
 
       this.updateShip(dt);
       this.updateWeapons(dt);
@@ -743,13 +1278,18 @@
           560,
           760,
           clamp(
-            this.elapsed / CONFIG.duration,
+            this.elapsed /
+              CONFIG.duration,
             0,
             1
           )
-        ) * speedMultiplier;
+        ) *
+        speedMultiplier;
 
-      for (const star of this.stars) {
+      for (
+        const star of
+        this.stars
+      ) {
         star.update(
           dt,
           starSpeed,
@@ -758,11 +1298,17 @@
         );
       }
 
-      for (const laser of this.lasers) {
+      for (
+        const laser of
+        this.lasers
+      ) {
         laser.update(dt);
       }
 
-      for (const meteor of this.meteors) {
+      for (
+        const meteor of
+        this.meteors
+      ) {
         meteor.update(
           dt,
           speedMultiplier,
@@ -770,34 +1316,44 @@
         );
       }
 
-      for (const particle of this.particles) {
+      for (
+        const particle of
+        this.particles
+      ) {
         particle.update(dt);
       }
 
       this.resolveLaserHits();
       this.resolveShipHits();
 
-      this.lasers = this.lasers.filter(
-        (item) => !item.dead
-      );
+      this.lasers =
+        this.lasers.filter(
+          (item) => !item.dead
+        );
 
-      this.meteors = this.meteors.filter(
-        (item) => !item.dead
-      );
+      this.meteors =
+        this.meteors.filter(
+          (item) => !item.dead
+        );
 
-      this.particles = this.particles.filter(
-        (item) => item.life > 0
-      );
+      this.particles =
+        this.particles.filter(
+          (item) =>
+            item.life > 0
+        );
 
-      this.shake = Math.max(
-        0,
-        this.shake - dt * 22
-      );
+      this.shake =
+        Math.max(
+          0,
+          this.shake -
+            dt * 22
+        );
 
       this.updateHud();
 
       if (
-        this.distance >= CONFIG.targetDistance ||
+        this.distance >=
+          CONFIG.targetDistance ||
         this.timeLeft <= 0
       ) {
         this.finish();
@@ -805,40 +1361,90 @@
     }
 
     updateShip(dt) {
+      const keyboardX =
+        (
+          controls.right
+            ? 1
+            : 0
+        ) -
+        (
+          controls.left
+            ? 1
+            : 0
+        );
+
+      const keyboardY =
+        (
+          controls.down
+            ? 1
+            : 0
+        ) -
+        (
+          controls.up
+            ? 1
+            : 0
+        );
+
       let dx =
-        (controls.right ? 1 : 0) -
-        (controls.left ? 1 : 0);
+        clamp(
+          keyboardX +
+            joystickAxis.x,
+          -1,
+          1
+        );
 
       let dy =
-        (controls.down ? 1 : 0) -
-        (controls.up ? 1 : 0);
+        clamp(
+          keyboardY +
+            joystickAxis.y,
+          -1,
+          1
+        );
 
-      if (dx && dy) {
-        dx *= Math.SQRT1_2;
-        dy *= Math.SQRT1_2;
+      const magnitude =
+        Math.hypot(dx, dy);
+
+      if (magnitude > 1) {
+        dx /= magnitude;
+        dy /= magnitude;
       }
 
       const moveSpeed =
-        this.engineOffline ? 225 : 420;
+        this.engineOffline
+          ? 225
+          : 420;
 
-      this.ship.x += dx * moveSpeed * dt;
-      this.ship.y += dy * moveSpeed * dt;
+      this.ship.x +=
+        dx *
+        moveSpeed *
+        dt;
 
-      this.ship.x = clamp(
-        this.ship.x,
-        this.playLeft +
-          this.ship.width * 0.38,
-        this.playRight -
-          this.ship.width * 0.38
-      );
+      this.ship.y +=
+        dy *
+        moveSpeed *
+        dt;
 
-      this.ship.y = clamp(
-        this.ship.y,
-        this.playTop +
-          this.ship.height * 0.45,
-        this.playBottom -
-          this.ship.height * 0.45
-      );
+      this.ship.x =
+        clamp(
+          this.ship.x,
+          this.playLeft +
+            this.ship.width *
+            0.38,
+          this.playRight -
+            this.ship.width *
+            0.38
+        );
+
+      this.ship.y =
+        clamp(
+          this.ship.y,
+          this.playTop +
+            this.ship.height *
+            0.45,
+          this.playBottom -
+            this.ship.height *
+            0.45
+        );
     }
 
     updateWeapons(dt) {
@@ -848,45 +1454,61 @@
         controls.fire &&
         !this.overheated
       ) {
-        this.heat = Math.min(
-          100,
-          this.heat + dt * 21
-        );
+        this.heat =
+          Math.min(
+            100,
+            this.heat +
+              dt * 21
+          );
 
-        if (this.fireCooldown <= 0) {
+        if (
+          this.fireCooldown <= 0
+        ) {
           this.fireCooldown = 0.13;
 
           const offset =
-            this.ship.width * 0.17;
+            this.ship.width *
+            0.17;
 
           this.lasers.push(
             new Laser(
-              this.ship.x - offset,
+              this.ship.x -
+                offset,
               this.ship.y -
-                this.ship.height * 0.35
+                this.ship.height *
+                0.35
             )
           );
 
           this.lasers.push(
             new Laser(
-              this.ship.x + offset,
+              this.ship.x +
+                offset,
               this.ship.y -
-                this.ship.height * 0.35
+                this.ship.height *
+                0.35
             )
           );
 
-          this.heat = Math.min(
-            100,
-            this.heat + 1.4
-          );
+          this.heat =
+            Math.min(
+              100,
+              this.heat +
+                1.4
+            );
         }
       } else {
-        this.heat = Math.max(
-          0,
-          this.heat -
-            dt *
-              (this.overheated ? 32 : 24)
-        );
+        this.heat =
+          Math.max(
+            0,
+            this.heat -
+              dt *
+              (
+                this.overheated
+                  ? 32
+                  : 24
+              )
+          );
       }
 
       if (
@@ -944,10 +1566,11 @@
           this.engineOffline = false;
           this.engineOfflineTimer = 0;
 
-          this.shieldRecharge = Math.max(
-            this.shieldRecharge,
-            CONFIG.postOutageShieldDelay
-          );
+          this.shieldRecharge =
+            Math.max(
+              this.shieldRecharge,
+              CONFIG.postOutageShieldDelay
+            );
 
           showToast(
             `${this.engineSide} ENGINE RESTARTED`
@@ -972,11 +1595,13 @@
         return;
       }
 
-      const progress = clamp(
-        this.elapsed / CONFIG.duration,
-        0,
-        1
-      );
+      const progress =
+        clamp(
+          this.elapsed /
+            CONFIG.duration,
+          0,
+          1
+        );
 
       const base =
         lerp(
@@ -986,22 +1611,28 @@
         ) /
         CONFIG.spawnRateMultiplier;
 
-      this.spawnTimer = random(
-        base * 0.76,
-        base * 1.35
-      );
+      this.spawnTimer =
+        random(
+          base * 0.76,
+          base * 1.35
+        );
 
       if (
         Math.random() <
-        0.06 + progress * 0.08
+        0.06 +
+          progress *
+          0.08
       ) {
-        this.waveGap = random(
-          1.1,
-          1.8
-        );
+        this.waveGap =
+          random(
+            1.1,
+            1.8
+          );
       }
 
-      this.spawnMeteor(progress);
+      this.spawnMeteor(
+        progress
+      );
 
       if (
         progress > 0.35 &&
@@ -1009,11 +1640,16 @@
         this.meteors.length <
           CONFIG.maxMeteors - 1
       ) {
-        setTimeout(() => {
-          if (this.running) {
-            this.spawnMeteor(progress);
-          }
-        }, 210);
+        setTimeout(
+          () => {
+            if (this.running) {
+              this.spawnMeteor(
+                progress
+              );
+            }
+          },
+          210
+        );
       }
     }
 
@@ -1021,7 +1657,8 @@
       let roll = Math.random();
 
       for (
-        const type of CONFIG.meteorTypes
+        const type of
+        CONFIG.meteorTypes
       ) {
         roll -= type.weight;
 
@@ -1037,52 +1674,75 @@
       const type =
         this.chooseMeteorType();
 
-      const scale = clamp(
-        Math.min(
-          this.width / 1366,
-          this.height / 768
-        ),
-        0.72,
-        1.32
-      );
+      const scale =
+        clamp(
+          Math.min(
+            this.width / 1366,
+            this.height / 768
+          ),
+          0.72,
+          1.32
+        );
 
       const size =
         random(
           type.minSize,
           type.maxSize
-        ) * scale;
+        ) *
+        scale;
 
       const minX =
-        this.playLeft + size * 0.5;
+        this.playLeft +
+        size * 0.5;
 
       const maxX =
-        this.playRight - size * 0.5;
+        this.playRight -
+        size * 0.5;
 
-      let x = random(minX, maxX);
+      let x =
+        random(
+          minX,
+          maxX
+        );
 
       /*
-       * Keep consecutive spawns from creating
-       * an unavoidable wall.
+       * Keep consecutive spawns from forming an unavoidable wall.
        */
-      const nearby = this.meteors.filter(
-        (meteor) =>
-          meteor.y < this.height * 0.24
-      );
+      const nearby =
+        this.meteors.filter(
+          (meteor) =>
+            meteor.y <
+            this.height *
+              0.24
+        );
 
       for (
         let attempt = 0;
         attempt < 5;
         attempt += 1
       ) {
-        const clear = nearby.every(
-          (meteor) =>
-            Math.abs(meteor.x - x) >
-            (meteor.size + size) * 0.48
-        );
+        const clear =
+          nearby.every(
+            (meteor) =>
+              Math.abs(
+                meteor.x - x
+              ) >
+              (
+                meteor.size +
+                size
+              ) *
+              0.48
+          );
 
-        if (clear) break;
+        if (clear) {
+          break;
+        }
 
-        x = random(minX, maxX);
+        x =
+          random(
+            minX,
+            maxX
+          );
       }
 
       const baseSpeed =
@@ -1090,7 +1750,8 @@
           245,
           340,
           progress
-        ) * type.speed;
+        ) *
+        type.speed;
 
       this.meteors.push(
         new Meteor(
@@ -1098,8 +1759,10 @@
           x,
           size,
           random(
-            baseSpeed * 0.88,
-            baseSpeed * 1.12
+            baseSpeed *
+              0.88,
+            baseSpeed *
+              1.12
           ),
           random(
             0,
@@ -1110,24 +1773,37 @@
     }
 
     resolveLaserHits() {
-      for (const laser of this.lasers) {
-        if (laser.dead) continue;
+      for (
+        const laser of
+        this.lasers
+      ) {
+        if (laser.dead) {
+          continue;
+        }
 
         for (
-          const meteor of this.meteors
+          const meteor of
+          this.meteors
         ) {
-          if (meteor.dead) continue;
+          if (meteor.dead) {
+            continue;
+          }
 
           const dx =
-            laser.x - meteor.x;
+            laser.x -
+            meteor.x;
 
           const dy =
-            laser.y - meteor.y;
+            laser.y -
+            meteor.y;
 
           if (
-            dx * dx + dy * dy <=
-            (meteor.radius +
-              laser.radius) ** 2
+            dx * dx +
+            dy * dy <=
+            (
+              meteor.radius +
+              laser.radius
+            ) ** 2
           ) {
             laser.dead = true;
 
@@ -1138,27 +1814,36 @@
               meteor.x,
               laser.y,
               '#55c9ff',
-              destroyed ? 1.2 : 0.55,
-              destroyed ? 14 : 5
+              destroyed
+                ? 1.2
+                : 0.55,
+              destroyed
+                ? 14
+                : 5
             );
 
             if (destroyed) {
               this.kills += 1;
+
               this.killScore +=
                 meteor.type.points;
 
               this.spark(
                 meteor.x,
                 meteor.y,
-                meteor.type.id === 'large'
+                meteor.type.id ===
+                  'large'
                   ? '#46a8ff'
-                  : meteor.type.id === 'medium'
+                  : meteor.type.id ===
+                      'medium'
                     ? '#ff8b38'
                     : '#f4f0e8',
-                meteor.type.id === 'large'
+                meteor.type.id ===
+                  'large'
                   ? 1.45
                   : 1,
-                meteor.type.id === 'large'
+                meteor.type.id ===
+                  'large'
                   ? 28
                   : 18
               );
@@ -1175,37 +1860,46 @@
         Math.min(
           this.ship.width,
           this.ship.height
-        ) * 0.29;
+        ) *
+        0.29;
 
       for (
-        const meteor of this.meteors
+        const meteor of
+        this.meteors
       ) {
         if (
           meteor.dead ||
           meteor.y <
             this.ship.y -
-              this.ship.height
+            this.ship.height
         ) {
           continue;
         }
 
         const dx =
-          meteor.x - this.ship.x;
+          meteor.x -
+          this.ship.x;
 
         const dy =
-          meteor.y - this.ship.y;
+          meteor.y -
+          this.ship.y;
 
         if (
-          dx * dx + dy * dy <=
-          (meteor.radius +
-            shipRadius) ** 2
+          dx * dx +
+          dy * dy <=
+          (
+            meteor.radius +
+            shipRadius
+          ) ** 2
         ) {
           meteor.dead = true;
           this.impacts += 1;
-          this.shake = Math.max(
-            this.shake,
-            8
-          );
+
+          this.shake =
+            Math.max(
+              this.shake,
+              8
+            );
 
           this.spark(
             meteor.x,
@@ -1217,6 +1911,7 @@
 
           if (this.shieldReady) {
             this.shieldReady = false;
+
             this.shieldRecharge =
               CONFIG.shieldRechargeSeconds;
 
@@ -1224,8 +1919,11 @@
               'DEFENCE FIELD RECHARGING',
               true
             );
-          } else if (!this.engineOffline) {
+          } else if (
+            !this.engineOffline
+          ) {
             this.engineOffline = true;
+
             this.engineOfflineTimer =
               CONFIG.engineOfflineSeconds;
 
@@ -1305,7 +2003,9 @@
 
     updateHud() {
       ui.timer.textContent =
-        formatTime(this.timeLeft);
+        formatTime(
+          this.timeLeft
+        );
 
       ui.distance.textContent =
         `${this.distance.toFixed(1)} LY`;
@@ -1338,10 +2038,11 @@
         ui.shieldLabel.textContent =
           'RECHARGE';
 
-        const total = this.engineOffline
-          ? CONFIG.engineOfflineSeconds +
-            CONFIG.postOutageShieldDelay
-          : CONFIG.shieldRechargeSeconds;
+        const total =
+          this.engineOffline
+            ? CONFIG.engineOfflineSeconds +
+              CONFIG.postOutageShieldDelay
+            : CONFIG.shieldRechargeSeconds;
 
         setMeter(
           ui.shieldMeter,
@@ -1357,9 +2058,11 @@
       }
 
       ui.velocity.textContent =
-        `${this.engineOffline
-          ? CONFIG.damagedVelocity
-          : CONFIG.normalVelocity.toLocaleString()} M/S`;
+        `${
+          this.engineOffline
+            ? CONFIG.damagedVelocity
+            : CONFIG.normalVelocity.toLocaleString()
+        } M/S`;
 
       ui.velocityBars.classList.toggle(
         'damaged',
@@ -1385,26 +2088,35 @@
         this.height
       );
 
-      const shakeX = this.shake
-        ? random(
-            -this.shake,
-            this.shake
-          )
-        : 0;
+      const shakeX =
+        this.shake
+          ? random(
+              -this.shake,
+              this.shake
+            )
+          : 0;
 
-      const shakeY = this.shake
-        ? random(
-            -this.shake,
-            this.shake
-          )
-        : 0;
+      const shakeY =
+        this.shake
+          ? random(
+              -this.shake,
+              this.shake
+            )
+          : 0;
 
       ctx.save();
-      ctx.translate(shakeX, shakeY);
+
+      ctx.translate(
+        shakeX,
+        shakeY
+      );
 
       this.drawSpace();
 
-      for (const star of this.stars) {
+      for (
+        const star of
+        this.stars
+      ) {
         star.draw(
           ctx,
           this.engineOffline
@@ -1414,13 +2126,15 @@
       }
 
       for (
-        const meteor of this.meteors
+        const meteor of
+        this.meteors
       ) {
         meteor.draw(ctx);
       }
 
       for (
-        const laser of this.lasers
+        const laser of
+        this.lasers
       ) {
         laser.draw(ctx);
       }
@@ -1428,7 +2142,8 @@
       this.drawShip();
 
       for (
-        const particle of this.particles
+        const particle of
+        this.particles
       ) {
         particle.draw(ctx);
       }
@@ -1476,7 +2191,8 @@
 
       ctx.lineWidth = 1;
 
-      const cx = this.width / 2;
+      const centreX =
+        this.width / 2;
 
       for (
         let i = 0;
@@ -1484,13 +2200,18 @@
         i += 1
       ) {
         const x =
-          (i / 17) * this.width;
+          (
+            i /
+            17
+          ) *
+          this.width;
 
         ctx.beginPath();
 
         ctx.moveTo(
-          cx,
-          this.height * 0.28
+          centreX,
+          this.height *
+            0.28
         );
 
         ctx.lineTo(
@@ -1510,14 +2231,17 @@
         shipImage.width /
         shipImage.height;
 
-      const height = clamp(
-        this.height * 0.18,
-        102,
-        156
-      );
+      const height =
+        clamp(
+          this.height *
+            0.18,
+          102,
+          156
+        );
 
       const width =
-        height * ratio;
+        height *
+        ratio;
 
       this.ship.width = width;
       this.ship.height = height;
@@ -1526,9 +2250,10 @@
         const pulse =
           1 +
           Math.sin(
-            this.elapsed * 4
+            this.elapsed *
+              4
           ) *
-            0.03;
+          0.03;
 
         ctx.save();
 
@@ -1544,8 +2269,12 @@
         ctx.ellipse(
           this.ship.x,
           this.ship.y,
-          width * 0.48 * pulse,
-          height * 0.47 * pulse,
+          width *
+            0.48 *
+            pulse,
+          height *
+            0.47 *
+            pulse,
           0,
           0,
           Math.PI * 2
@@ -1559,7 +2288,11 @@
         ctx.strokeStyle =
           'rgba(255,141,50,.58)';
 
-        ctx.setLineDash([5, 9]);
+        ctx.setLineDash([
+          5,
+          9
+        ]);
+
         ctx.lineWidth = 2;
 
         ctx.beginPath();
@@ -1582,7 +2315,8 @@
 
       if (this.engineOffline) {
         const sideX =
-          this.engineSide === 'LEFT'
+          this.engineSide ===
+          'LEFT'
             ? this.ship.x -
               width * 0.26
             : this.ship.x +
@@ -1591,7 +2325,9 @@
         ctx.fillStyle =
           'rgba(255,48,57,.22)';
 
-        ctx.shadowColor = '#ff3039';
+        ctx.shadowColor =
+          '#ff3039';
+
         ctx.shadowBlur = 20;
 
         ctx.beginPath();
@@ -1610,8 +2346,10 @@
 
       ctx.drawImage(
         shipImage,
-        this.ship.x - width / 2,
-        this.ship.y - height / 2,
+        this.ship.x -
+          width / 2,
+        this.ship.y -
+          height / 2,
         width,
         height
       );
@@ -1620,67 +2358,95 @@
     }
 
     finish() {
-      if (this.finished) return;
+      if (this.finished) {
+        return;
+      }
 
       this.finished = true;
       this.running = false;
 
       /*
-       * Critical touch fix:
-       * release FIRE and every directional control
-       * before displaying the results screen.
+       * Releases all touchscreen pointers before the result overlay appears.
+       * This prevents a captured FIRE pointer from swallowing Retry or Return.
        */
       releaseAllControls();
 
-      const overallScore = Math.round(
-        this.killScore * this.distance
-      );
+      const overallScore =
+        Math.round(
+          this.killScore *
+          this.distance
+        );
 
+      /*
+       * Three stars require both the score threshold and a flawless engine run.
+       */
       const earnedThreeStars =
-  overallScore >= CONFIG.scoreThresholds.threeStars &&
-  this.engineOutages === 0;
+        overallScore >=
+          CONFIG.scoreThresholds.threeStars &&
+        this.engineOutages === 0;
 
-const stars = earnedThreeStars
-  ? 3
-  : overallScore >= CONFIG.scoreThresholds.twoStars
-    ? 2
-    : 1;
+      const stars =
+        earnedThreeStars
+          ? 3
+          : overallScore >=
+              CONFIG.scoreThresholds.twoStars
+            ? 2
+            : 1;
+
       const reachedEndpoint =
         this.distance >=
         CONFIG.targetDistance;
 
-      const timeRemaining = Math.max(
-        0,
-        this.timeLeft
-      );
+      const timeRemaining =
+        Math.max(
+          0,
+          this.timeLeft
+        );
 
       const narrative =
         stars === 3
-          ? 'Luna tears through the field and reaches the next sector with a tactical advantage.'
-          : stars === 2
-            ? 'Luna clears the field with manageable delay. The ship remains operational.'
-            : 'Luna survives the crossing, but arrives late with systems still recovering.';
+          ? 'Luna tears through the field without losing either engine and reaches the next sector with a tactical advantage.'
+          : overallScore >=
+                CONFIG.scoreThresholds.threeStars &&
+              this.engineOutages > 0
+            ? 'Luna achieves an exceptional combat score, but an engine shutdown prevents a perfect crossing.'
+            : stars === 2
+              ? 'Luna clears the field with manageable delay. The ship remains operational.'
+              : 'Luna survives the crossing, but arrives late with systems still recovering.';
 
       this.result = {
         version: 1,
         stars,
-        distance: Number(
-          this.distance.toFixed(2)
-        ),
+
+        distance:
+          Number(
+            this.distance.toFixed(2)
+          ),
+
         targetDistance:
           CONFIG.targetDistance,
+
         reachedEndpoint,
-        timeRemaining: Number(
-          timeRemaining.toFixed(2)
-        ),
+
+        timeRemaining:
+          Number(
+            timeRemaining.toFixed(2)
+          ),
+
         meteoritesObliterated:
           this.kills,
+
         obliterationScore:
           this.killScore,
+
         overallScore,
-        impacts: this.impacts,
+
+        impacts:
+          this.impacts,
+
         engineOutages:
           this.engineOutages,
+
         completedAt:
           new Date().toISOString()
       };
@@ -1688,13 +2454,17 @@ const stars = earnedThreeStars
       try {
         sessionStorage.setItem(
           'theVoidDebrisResult',
-          JSON.stringify(this.result)
+          JSON.stringify(
+            this.result
+          )
         );
 
         localStorage.setItem(
           'theVoidDebrisBest',
           JSON.stringify(
-            this.bestOf(this.result)
+            this.bestOf(
+              this.result
+            )
           )
         );
       } catch (error) {
@@ -1721,7 +2491,9 @@ const stars = earnedThreeStars
           {
             type:
               'THE_VOID_DEBRIS_COMPLETE',
-            result: this.result
+
+            result:
+              this.result
           },
           '*'
         );
@@ -1732,13 +2504,18 @@ const stars = earnedThreeStars
           ? 'ENDPOINT REACHED'
           : 'SECTOR TRANSIT COMPLETE';
 
-      ui.stars.className = 'stars';
+      ui.stars.className =
+        'stars';
 
       ui.stars.innerHTML =
         [1, 2, 3]
           .map(
             (index) =>
-              `<span class="${index <= stars ? 'earned' : ''}">★</span>`
+              `<span class="${
+                index <= stars
+                  ? 'earned'
+                  : ''
+              }">★</span>`
           )
           .join(' ');
 
@@ -1760,24 +2537,30 @@ const stars = earnedThreeStars
         overallScore.toLocaleString();
 
       ui.resultOutages.textContent =
-        String(this.engineOutages);
-
-      setTimeout(() => {
-        ui.result.classList.add(
-          'active'
+        String(
+          this.engineOutages
         );
-      }, 420);
+
+      setTimeout(
+        () => {
+          ui.result.classList.add(
+            'active'
+          );
+        },
+        420
+      );
     }
 
     bestOf(current) {
       let previous = null;
 
       try {
-        previous = JSON.parse(
-          localStorage.getItem(
-            'theVoidDebrisBest'
-          )
-        );
+        previous =
+          JSON.parse(
+            localStorage.getItem(
+              'theVoidDebrisBest'
+            )
+          );
       } catch {
         previous = null;
       }
@@ -1792,45 +2575,210 @@ const stars = earnedThreeStars
     }
   }
 
-  function bindHoldButton(
-    button,
-    key
-  ) {
-    button.addEventListener(
+  function prepareTouchControls() {
+    if (
+      !ui.steerPad ||
+      !ui.fireButton
+    ) {
+      throw new Error(
+        'Debris Field controls are missing from the page.'
+      );
+    }
+
+    /*
+     * These are applied from JavaScript so the touch fix works without any
+     * additional CSS edit.
+     */
+    ui.steerPad.style.touchAction =
+      'none';
+
+    ui.steerPad.style.userSelect =
+      'none';
+
+    ui.steerPad.style.webkitUserSelect =
+      'none';
+
+    ui.steerPad.style.webkitTouchCallout =
+      'none';
+
+    /*
+     * The arrow buttons become visual indicators only. The entire circular
+     * ring behaves as one draggable analogue joystick.
+     */
+    ui.steerPad
+      .querySelectorAll(
+        '.control-button, .dpad-core'
+      )
+      .forEach((node) => {
+        node.style.pointerEvents =
+          'none';
+
+        node.style.userSelect =
+          'none';
+
+        node.style.webkitUserSelect =
+          'none';
+
+        node.style.webkitTouchCallout =
+          'none';
+      });
+
+    ui.fireButton.style.touchAction =
+      'none';
+
+    ui.fireButton.style.userSelect =
+      'none';
+
+    ui.fireButton.style.webkitUserSelect =
+      'none';
+
+    ui.fireButton.style.webkitTouchCallout =
+      'none';
+  }
+
+  function bindJoystick() {
+    ui.steerPad.addEventListener(
       'pointerdown',
       (event) => {
-        if (game?.finished) return;
+        if (
+          game?.finished ||
+          inputPointers.steer !== null
+        ) {
+          return;
+        }
 
         event.preventDefault();
 
-        /*
-         * Clear any stale control which happens
-         * to be carrying the same pointer ID.
-         */
-        releaseControlPointer(
-          event.pointerId
-        );
+        inputPointers.steer =
+          event.pointerId;
 
-        activeControlPointers.set(
-          event.pointerId,
-          {
-            key,
-            button
-          }
-        );
+        try {
+          ui.steerPad.setPointerCapture(
+            event.pointerId
+          );
+        } catch {
+          /*
+           * Global pointer-release handlers remain available as a fallback.
+           */
+        }
 
-        controls[key] = true;
-
-        button.classList.add(
-          'pressed'
-        );
+        updateJoystick(event);
       },
       {
         passive: false
       }
     );
 
-    button.addEventListener(
+    ui.steerPad.addEventListener(
+      'pointermove',
+      (event) => {
+        if (
+          event.pointerId !==
+          inputPointers.steer
+        ) {
+          return;
+        }
+
+        event.preventDefault();
+
+        updateJoystick(event);
+      },
+      {
+        passive: false
+      }
+    );
+
+    const finishJoystickPointer =
+      (event) => {
+        if (
+          event.pointerId !==
+          inputPointers.steer
+        ) {
+          return;
+        }
+
+        releaseJoystick();
+      };
+
+    ui.steerPad.addEventListener(
+      'pointerup',
+      finishJoystickPointer
+    );
+
+    ui.steerPad.addEventListener(
+      'pointercancel',
+      finishJoystickPointer
+    );
+
+    ui.steerPad.addEventListener(
+      'lostpointercapture',
+      finishJoystickPointer
+    );
+  }
+
+  function bindFireControl() {
+    ui.fireButton.addEventListener(
+      'pointerdown',
+      (event) => {
+        if (
+          game?.finished ||
+          inputPointers.fire !== null
+        ) {
+          return;
+        }
+
+        event.preventDefault();
+
+        inputPointers.fire =
+          event.pointerId;
+
+        touchFireHeld = true;
+
+        syncFireState();
+
+        try {
+          ui.fireButton.setPointerCapture(
+            event.pointerId
+          );
+        } catch {
+          /*
+           * Global pointer-release handlers remain available as a fallback.
+           */
+        }
+      },
+      {
+        passive: false
+      }
+    );
+
+    const finishFirePointer =
+      (event) => {
+        if (
+          event.pointerId !==
+          inputPointers.fire
+        ) {
+          return;
+        }
+
+        releaseFire();
+      };
+
+    ui.fireButton.addEventListener(
+      'pointerup',
+      finishFirePointer
+    );
+
+    ui.fireButton.addEventListener(
+      'pointercancel',
+      finishFirePointer
+    );
+
+    ui.fireButton.addEventListener(
+      'lostpointercapture',
+      finishFirePointer
+    );
+
+    ui.fireButton.addEventListener(
       'contextmenu',
       (event) => {
         event.preventDefault();
@@ -1839,33 +2787,30 @@ const stars = earnedThreeStars
   }
 
   function bindControls() {
-    document
-      .querySelectorAll(
-        '[data-control]'
-      )
-      .forEach((button) => {
-        bindHoldButton(
-          button,
-          button.dataset.control
-        );
-      });
-
-    bindHoldButton(
-      ui.fireButton,
-      'fire'
-    );
+    prepareTouchControls();
+    bindJoystick();
+    bindFireControl();
 
     /*
-     * Pointer release is listened for globally.
-     * This protects against a finger leaving the
-     * original button before being lifted.
+     * Global release listeners catch pointer releases that Safari fails to
+     * route back to the original element.
      */
     window.addEventListener(
       'pointerup',
       (event) => {
-        releaseControlPointer(
-          event.pointerId
-        );
+        if (
+          event.pointerId ===
+          inputPointers.steer
+        ) {
+          releaseJoystick();
+        }
+
+        if (
+          event.pointerId ===
+          inputPointers.fire
+        ) {
+          releaseFire();
+        }
       },
       {
         capture: true
@@ -1875,38 +2820,38 @@ const stars = earnedThreeStars
     window.addEventListener(
       'pointercancel',
       (event) => {
-        releaseControlPointer(
-          event.pointerId
-        );
+        if (
+          event.pointerId ===
+          inputPointers.steer
+        ) {
+          releaseJoystick();
+        }
+
+        if (
+          event.pointerId ===
+          inputPointers.fire
+        ) {
+          releaseFire();
+        }
       },
       {
         capture: true
       }
     );
 
-    document.addEventListener(
-      'visibilitychange',
-      () => {
-        if (document.hidden) {
-          releaseAllControls();
-        }
-      }
-    );
-
-    window.addEventListener(
-      'pagehide',
-      releaseAllControls
-    );
-
     const keyMap = {
       ArrowUp: 'up',
       KeyW: 'up',
+
       ArrowDown: 'down',
       KeyS: 'down',
+
       ArrowLeft: 'left',
       KeyA: 'left',
+
       ArrowRight: 'right',
       KeyD: 'right',
+
       Space: 'fire'
     };
 
@@ -1916,16 +2861,20 @@ const stars = earnedThreeStars
         const control =
           keyMap[event.code];
 
-        if (!control) return;
+        if (!control) {
+          return;
+        }
 
         event.preventDefault();
 
-        controls[control] = true;
-
         if (control === 'fire') {
-          ui.fireButton.classList.add(
-            'pressed'
-          );
+          keyboardFireHeld = true;
+
+          syncFireState();
+        } else {
+          controls[control] = true;
+
+          updateDirectionVisuals();
         }
       },
       {
@@ -1939,16 +2888,20 @@ const stars = earnedThreeStars
         const control =
           keyMap[event.code];
 
-        if (!control) return;
+        if (!control) {
+          return;
+        }
 
         event.preventDefault();
 
-        controls[control] = false;
-
         if (control === 'fire') {
-          ui.fireButton.classList.remove(
-            'pressed'
-          );
+          keyboardFireHeld = false;
+
+          syncFireState();
+        } else {
+          controls[control] = false;
+
+          updateDirectionVisuals();
         }
       },
       {
@@ -1959,6 +2912,20 @@ const stars = earnedThreeStars
     window.addEventListener(
       'blur',
       releaseAllControls
+    );
+
+    window.addEventListener(
+      'pagehide',
+      releaseAllControls
+    );
+
+    document.addEventListener(
+      'visibilitychange',
+      () => {
+        if (document.hidden) {
+          releaseAllControls();
+        }
+      }
     );
 
     document.addEventListener(
@@ -2021,8 +2988,13 @@ const stars = earnedThreeStars
   }
 
   function setupUi() {
-    buildMeter(ui.shieldMeter);
-    buildMeter(ui.heatMeter);
+    buildMeter(
+      ui.shieldMeter
+    );
+
+    buildMeter(
+      ui.heatMeter
+    );
 
     setMeter(
       ui.shieldMeter,
@@ -2049,13 +3021,16 @@ const stars = earnedThreeStars
       () => {
         releaseAllControls();
 
-        if (!game?.result) return;
+        if (!game?.result) {
+          return;
+        }
 
         window.dispatchEvent(
           new CustomEvent(
             'thevoid:debris-continue',
             {
-              detail: game.result
+              detail:
+                game.result
             }
           )
         );
@@ -2068,7 +3043,9 @@ const stars = earnedThreeStars
             {
               type:
                 'THE_VOID_DEBRIS_CONTINUE',
-              result: game.result
+
+              result:
+                game.result
             },
             '*'
           );
@@ -2086,7 +3063,8 @@ const stars = earnedThreeStars
     try {
       await preload();
 
-      game = new DebrisGame();
+      game =
+        new DebrisGame();
 
       window.addEventListener(
         'resize',
@@ -2115,13 +3093,16 @@ const stars = earnedThreeStars
         })
       };
 
-      setTimeout(() => {
-        ui.loading.classList.remove(
-          'active'
-        );
+      setTimeout(
+        () => {
+          ui.loading.classList.remove(
+            'active'
+          );
 
-        game.start();
-      }, 280);
+          game.start();
+        },
+        280
+      );
     } catch (error) {
       console.error(error);
 
