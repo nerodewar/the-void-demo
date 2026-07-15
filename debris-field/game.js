@@ -1636,15 +1636,15 @@
         this.killScore * this.distance
       );
 
-      const stars =
-        overallScore >=
-        CONFIG.scoreThresholds.threeStars
-          ? 3
-          : overallScore >=
-              CONFIG.scoreThresholds.twoStars
-            ? 2
-            : 1;
+      const earnedThreeStars =
+  overallScore >= CONFIG.scoreThresholds.threeStars &&
+  this.engineOutages === 0;
 
+const stars = earnedThreeStars
+  ? 3
+  : overallScore >= CONFIG.scoreThresholds.twoStars
+    ? 2
+    : 1;
       const reachedEndpoint =
         this.distance >=
         CONFIG.targetDistance;
