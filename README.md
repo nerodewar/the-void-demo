@@ -38,3 +38,9 @@ A cinematic solo science-fiction survival demo by **James Ritchie**. This build 
 ## Debris Field mini-game
 
 The title menu now includes **The Void: Debris Field Mini-game**. Its files live in `debris-field/` and its transparent gameplay assets are `assets/IMGA1.png` through `assets/IMGA4.png`. The results screen returns to the main title.
+
+## Hunt 01: Engine Kill
+
+The title screen now includes a standalone Chapter Two top-down prototype. Luna has five minutes to restore engine power, prime the manual thrusters, control the organism with a limited plasma weapon, recharge in Storage, and lure the target into either downward-facing thruster chamber. The mode is fully local and is included in the offline archive.
+
+Custom Hunt 01 sound effects can replace the generated WAV files in `hunt01/assets/sound-effects/` without changing the code.

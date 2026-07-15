@@ -1,9 +1,15 @@
-The Void Demo v1.0.7 Offline iPad PWA
+The Void Demo v1.1.0 Offline iPad PWA
 
-Checkpoint 02 progression repair:
-- Checkpoint 02 now returns Luna to the Engineering Room instead of launching the maintenance route from the checkpoint dialog.
-- The Engineering Room presents ENTER MAINTENANCE TUNNELS only after Luna has collected the plasma gun and flashlight.
-- The maintenance action now verifies the required equipment before starting the existing sat-nav failure and component-replacement storyline.
-- Service-worker cache updated to v1.1.6.
+Hunt Mode update:
+- Added HUNT 01: ENGINE KILL to the full game's main title menu.
+- Added a standalone top-down Chapter Two prototype under hunt01/.
+- Five-minute mission timer with failure, restart and main-menu exit flows.
+- Plasma-only combat: 12-cell capacity, stun/slow/knockback behaviour, empty-cell feedback and timed Storage Room recharge.
+- Power Relay, central Engine Room priming, dual engine-access corridors and a choice of port or starboard thruster execution.
+- Stalking, charging, attacking and plasma-stunned alien behaviour with pathfinding, motion tracker and scanner pulse.
+- Desktop and hardened iPad dual-stick controls.
+- Local Hunt Mode music and replaceable local sound-effect placeholders.
+- SVG master floorplan, animated warning lights, darkness, sparks, slime trails, projectiles and cinematic thruster kill.
+- Offline service-worker cache updated to v1.2.0.
 
-All previous offline PWA, Debris Field, control, narrative, audio and checkpoint fixes are retained.
+All previous Chapter One, sat-nav route, offline PWA, Debris Field, narrative, audio and checkpoint fixes are retained.

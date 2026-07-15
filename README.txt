@@ -1,3 +1,17 @@
+THE VOID DEMO v1.1.0 — HUNT MODE BUILD
+
+Added:
+- HUNT 01: ENGINE KILL as a standalone top-down Chapter Two prototype on the main title screen.
+- Five-minute engine-shutdown hunt with restart or main-menu failure choices.
+- Plasma-only combat, limited cells and timed recharge in the Storage Room.
+- Power restoration, Engine Room priming and two valid thruster execution routes.
+- Alien stalking, charging, attacking and plasma-stunned states.
+- Local Hunt Mode music plus replaceable sound-effect assets under hunt01/assets/sound-effects.
+- Editable SVG floorplan and cinematic thruster execution.
+- Offline cache advanced to v1.2.0.
+
+Previous release notes follow.
+
 THE VOID DEMO v1.0.7 — CHECKPOINT 02 PROGRESSION REPAIR
 
 Fixed:

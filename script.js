@@ -163,6 +163,7 @@
   const continueGameMeta = document.getElementById("continueGameMeta");
   const creditsButton = document.getElementById("creditsButton");
   const debrisFieldButton = document.getElementById("debrisFieldButton");
+  const hunt01Button = document.getElementById("hunt01Button");
   const titleEnterHint = document.getElementById("titleEnterHint");
   const demoEndScreen = document.getElementById("demoEndScreen");
   const demoEndTitleButton = document.getElementById("demoEndTitleButton");
@@ -5687,6 +5688,10 @@ No command source is identified.`, button: "CONTINUE", presentation: "restored",
   debrisFieldButton?.addEventListener("click", () => {
     fadeTitleMusicOut(420);
     window.location.href = "debris-field/index.html?autostart=1&return=../index.html";
+  });
+  hunt01Button?.addEventListener("click", () => {
+    fadeTitleMusicOut(420);
+    window.location.href = "hunt01/index.html?autostart=1&return=../index.html";
   });
   creditsButton.addEventListener("click", () => openCreditsSequence());
   creditsMuteButton?.addEventListener("click", toggleCreditsMute);

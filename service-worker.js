@@ -1,6 +1,6 @@
 "use strict";
 
-const CACHE_VERSION = "the-void-demo-v1.1.6";
+const CACHE_VERSION = "the-void-demo-v1.2.0";
 const CORE_ASSETS = [
   "./",
   "./index.html",
@@ -13,6 +13,16 @@ const CORE_ASSETS = [
   "./debris-field/index.html",
   "./debris-field/styles.css",
   "./debris-field/game.js",
+  "./hunt01/index.html",
+  "./hunt01/styles.css",
+  "./hunt01/game.js",
+  "./hunt01/assets/map/hunt01-map.svg",
+  "./hunt01/assets/map/map-data.json",
+  "./hunt01/assets/sprites/luna-walk.png",
+  "./hunt01/assets/sprites/luna-aim.png",
+  "./hunt01/assets/sprites/luna-damage.png",
+  "./hunt01/assets/sprites/alien.png",
+  "./hunt01/assets/music/hunt01-theme.mp3",
   "./assets/icons/icon-180.png",
   "./assets/icons/icon-192.png",
   "./assets/icons/icon-512.png",
@@ -31,6 +41,39 @@ const ALL_ASSETS = [
   "./debris-field/index.html",
   "./debris-field/styles.css",
   "./debris-field/game.js",
+  "./hunt01/assets/images/hunt01-concept-map.png",
+  "./hunt01/assets/images/interactables-source.png",
+  "./hunt01/assets/images/thruster-cinematic.png",
+  "./hunt01/assets/map/hunt01-map.svg",
+  "./hunt01/assets/map/map-data.json",
+  "./hunt01/assets/music/hunt01-theme.mp3",
+  "./hunt01/assets/sound-effects/alien-attack.wav",
+  "./hunt01/assets/sound-effects/alien-charge.wav",
+  "./hunt01/assets/sound-effects/alien-hurt.wav",
+  "./hunt01/assets/sound-effects/alien-stalk.wav",
+  "./hunt01/assets/sound-effects/door-open.wav",
+  "./hunt01/assets/sound-effects/emergency-alarm-loop.wav",
+  "./hunt01/assets/sound-effects/footstep.wav",
+  "./hunt01/assets/sound-effects/luna-hit.wav",
+  "./hunt01/assets/sound-effects/mission-fail.wav",
+  "./hunt01/assets/sound-effects/mission-success.wav",
+  "./hunt01/assets/sound-effects/plasma-empty.wav",
+  "./hunt01/assets/sound-effects/plasma-impact.wav",
+  "./hunt01/assets/sound-effects/plasma-recharge-complete.wav",
+  "./hunt01/assets/sound-effects/plasma-recharge-loop.wav",
+  "./hunt01/assets/sound-effects/plasma-shot.wav",
+  "./hunt01/assets/sound-effects/ship-shutdown.wav",
+  "./hunt01/assets/sound-effects/terminal-activate.wav",
+  "./hunt01/assets/sound-effects/thruster-blast.wav",
+  "./hunt01/assets/sound-effects/thruster-prime.wav",
+  "./hunt01/assets/sprites/alien.png",
+  "./hunt01/assets/sprites/luna-aim.png",
+  "./hunt01/assets/sprites/luna-damage.png",
+  "./hunt01/assets/sprites/luna-walk.png",
+  "./hunt01/assets/sprites/sprite-data.json",
+  "./hunt01/game.js",
+  "./hunt01/index.html",
+  "./hunt01/styles.css",
   "./assets/icons/icon-180.png",
   "./assets/icons/icon-192.png",
   "./assets/icons/icon-512.png",
@@ -215,7 +258,9 @@ self.addEventListener("fetch", (event) => {
       const cache = await caches.open(CACHE_VERSION);
       const requestUrl = new URL(event.request.url);
       const isDebrisField = requestUrl.pathname.includes("/debris-field");
-      const fallbackUrl = scopedUrl(isDebrisField ? "./debris-field/index.html" : "./index.html");
+      const isHunt01 = requestUrl.pathname.includes("/hunt01");
+      const fallbackPath = isHunt01 ? "./hunt01/index.html" : (isDebrisField ? "./debris-field/index.html" : "./index.html");
+      const fallbackUrl = scopedUrl(fallbackPath);
       const cached = await cache.match(event.request, { ignoreSearch: true })
         || await cache.match(fallbackUrl, { ignoreSearch: true })
         || await caches.match(fallbackUrl, { ignoreSearch: true });
