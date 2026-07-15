@@ -1,0 +1,58 @@
+{
+  "lunaWalk": {
+    "url": "assets/sprites/luna-walk.png",
+    "cell": [
+      144,
+      180
+    ],
+    "directions": [
+      "down",
+      "left",
+      "up",
+      "right"
+    ],
+    "framesPerDirection": 4
+  },
+  "lunaAim": {
+    "url": "assets/sprites/luna-aim.png",
+    "cell": [
+      180,
+      180
+    ],
+    "directions": [
+      "down",
+      "left",
+      "up",
+      "right"
+    ],
+    "framesPerDirection": 3
+  },
+  "lunaDamage": {
+    "url": "assets/sprites/luna-damage.png",
+    "cell": [
+      180,
+      180
+    ],
+    "directions": [
+      "down",
+      "left",
+      "up",
+      "right"
+    ],
+    "framesPerDirection": 3
+  },
+  "alien": {
+    "url": "assets/sprites/alien.png",
+    "cell": [
+      200,
+      160
+    ],
+    "states": [
+      "stalking",
+      "charging",
+      "attacking",
+      "stunned"
+    ],
+    "framesPerState": 6
+  }
+}
