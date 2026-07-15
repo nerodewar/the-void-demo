@@ -1,3 +1,14 @@
+THE VOID DEMO v1.0.7 — CHECKPOINT 02 PROGRESSION REPAIR
+
+Fixed:
+- Checkpoint 02 now closes back into the Engineering Room.
+- ENTER MAINTENANCE TUNNELS appears in Engineering only after the plasma gun and flashlight have been collected.
+- The checkpoint dialog no longer attempts to start the maintenance storyline itself.
+- The existing sat-nav failure, replacement component and EVA repair storyline continues unchanged.
+- Offline service-worker cache advanced to v1.1.6.
+
+Previous release notes follow.
+
 THE VOID DEMO v1.0.6 — CHAPTER ONE ROUTE AMENDMENT
 
 Changed:

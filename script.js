@@ -307,6 +307,10 @@
     candidate.checkpoint = Math.max(0, Math.min(Number(candidate.checkpoint) || 0, 6));
 
     if (candidate.damageLogged) candidate.checkpoint = Math.max(candidate.checkpoint, 1);
+    if (candidate.equipmentTaken) {
+      candidate.plasmaGun = true;
+      candidate.flashlight = true;
+    }
     if (candidate.hidingCompleted) candidate.checkpoint = Math.max(candidate.checkpoint, 2);
     if (candidate.finalReported) candidate.checkpoint = Math.max(candidate.checkpoint, 3);
     if (candidate.actTwoComplete) candidate.checkpoint = Math.max(candidate.checkpoint, 4);
@@ -351,18 +355,18 @@
     candidate.earthMinutesRemaining = Math.max(0, Math.min(Number(candidate.earthMinutesRemaining) || 2880, 2880));
     candidate.rebreatherSeconds = Math.max(0, Math.min(Number(candidate.rebreatherSeconds) || 90, 90));
 
-    // v1.0.6 removes the post-hiding distress-call branch. Any unfinished
-    // legacy save on that route resumes at Checkpoint 02 and enters the
-    // retained maintenance / sat-nav component replacement storyline.
+    // The removed distress-call branch is folded back into Checkpoint 02.
+    // Luna returns to Engineering and must deliberately enter the maintenance
+    // tunnels after the plasma gun and flashlight have been collected.
     if (candidate.branch === "signal" && !candidate.finalReported && !candidate.blackoutStarted && !candidate.actTwoComplete) {
-      candidate.branch = "alone";
+      candidate.branch = "";
       candidate.engineRepaired = false;
       candidate.lightsOut = false;
       candidate.satNavFailed = false;
       candidate.satNavDiagnosed = false;
       candidate.satNavModule = false;
       candidate.satNavRepaired = false;
-      candidate.currentRoom = "tunnels";
+      candidate.currentRoom = "engineering";
     }
 
     // v0.5.2 removes the Auxiliary Power scavenger chain. Old saves are
@@ -3523,8 +3527,7 @@
       if (state.hidingCompleted) {
         if (!state.equipmentTaken) return [{ label: "SEARCH THE STORE ROOM", meta: "FLASHLIGHT + PLASMA GUN", special: true, onClick: () => moveToRoom("store") }];
         return [
-          { label: "ENTER MAINTENANCE ROUTE", meta: "ENGINEERING SYSTEMS", special: true, onClick: startAloneBranch },
-          { label: "REVIEW CHECKPOINT 02", meta: "STATUS", onClick: () => openDialog(chapterDialog) }
+          { label: "ENTER MAINTENANCE TUNNELS", meta: "ENGINEERING SYSTEMS", special: true, onClick: startAloneBranch }
         ];
       }
 
@@ -4063,8 +4066,27 @@
     );
   }
 
+  async function closeCheckpoint02() {
+    closeDialog(chapterDialog);
+    state.currentRoom = "engineering";
+    saveState();
+    updateInterface();
+    await showRoom("engineering", { immediate: true });
+    showToast(state.equipmentTaken
+      ? "CHECKPOINT 02 SAVED // MAINTENANCE TUNNEL ACCESS AVAILABLE"
+      : "CHECKPOINT 02 SAVED // COLLECT PLASMA GUN AND FLASHLIGHT");
+  }
+
   function startAloneBranch() {
     closeDialog(chapterDialog);
+    if (!state.hidingCompleted || !state.equipmentTaken || !state.plasmaGun || !state.flashlight) {
+      state.currentRoom = "engineering";
+      saveState();
+      updateInterface();
+      showRoom("engineering", { immediate: true });
+      showToast("PLASMA GUN AND FLASHLIGHT REQUIRED // SEARCH THE STORE ROOM");
+      return;
+    }
     state.branch = "alone";
     state.mapMode = "alone_engine";
     state.currentRoom = "tunnels";
@@ -5707,7 +5729,7 @@ No command source is identified.`, button: "CONTINUE", presentation: "restored",
   continueButton.addEventListener("click", advanceIntro);
   acknowledgeGroundButton.addEventListener("click", acknowledgeGroundControl);
   sequenceButton.addEventListener("click", advanceSequence);
-  closeChapterButton.addEventListener("click", startAloneBranch);
+  closeChapterButton.addEventListener("click", closeCheckpoint02);
   acknowledgeFinalButton.addEventListener("click", beginBlackoutAct);
   restartButton.addEventListener("click", restartGame);
   demoEndTitleButton?.addEventListener("click", returnFromDemoEndToTitle);
