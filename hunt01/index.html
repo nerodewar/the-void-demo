@@ -47,16 +47,23 @@
     </div>
 
     <div class="message-flash" id="messageFlash" hidden></div>
+    <div class="room-title" id="roomTitle" hidden aria-live="polite">
+      <span>DECK SECTION</span>
+      <strong id="roomTitleText">CONTROL CORRIDOR</strong>
+    </div>
     <div class="damage-flash" id="damageFlash" aria-hidden="true"></div>
     <div class="charge-flash" id="chargeFlash" aria-hidden="true"></div>
 
     <section class="touch-controls" id="touchControls" hidden aria-label="Touch controls">
-      <div class="stick-zone move-zone" id="moveZone"><div class="stick-ring"><i id="moveKnob"></i></div><span>MOVE</span></div>
+      <div class="left-control-stack">
+        <button class="touch-button fire-button" id="fireButton" type="button" aria-label="Press and hold to fire plasma">FIRE</button>
+        <div class="stick-zone move-zone" id="moveZone"><div class="stick-ring"><i id="moveKnob"></i></div><span>MOVE</span></div>
+      </div>
       <div class="touch-center-actions">
         <button class="touch-button scanner-button" id="scannerButton" type="button">PULSE</button>
         <button class="touch-button interact-button" id="interactButton" type="button">INTERACT</button>
       </div>
-      <div class="stick-zone aim-zone" id="aimZone"><div class="stick-ring"><i id="aimKnob"></i></div><span>AIM + FIRE</span></div>
+      <div class="stick-zone aim-zone" id="aimZone"><div class="stick-ring"><i id="aimKnob"></i></div><span>AIM</span></div>
     </section>
 
     <section class="screen intro-screen is-visible" id="introScreen">
@@ -73,7 +80,7 @@
           <div><span>MISSION LIMIT</span><strong>05:00</strong><small>Failure ends the hunt and resets the level.</small></div>
           <div><span>EXECUTION</span><strong>EITHER THRUSTER</strong><small>Lead the target into the marked ignition zone.</small></div>
         </div>
-        <div class="control-copy"><span>DESKTOP: WASD + MOUSE + CLICK + E</span><span>IPAD: LEFT STICK + RIGHT AIM/FIRE + INTERACT</span></div>
+        <div class="control-copy"><span>DESKTOP: WASD + MOUSE AIM + CLICK/SPACE TO FIRE + E</span><span>IPAD: LEFT STICK + RIGHT AIM + FIRE + INTERACT</span></div>
         <div class="screen-actions">
           <button class="primary-button" id="startButton" type="button">ENTER HUNT MODE</button>
           <button class="secondary-button menu-return" type="button">RETURN TO MAIN MENU</button>

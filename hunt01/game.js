@@ -29,6 +29,8 @@
   const interactionProgress = $("#interactionProgress");
   const interactionKey = $("#interactionKey");
   const messageFlash = $("#messageFlash");
+  const roomTitle = $("#roomTitle");
+  const roomTitleText = $("#roomTitleText");
   const damageFlash = $("#damageFlash");
   const chargeFlash = $("#chargeFlash");
   const touchControls = $("#touchControls");
@@ -38,6 +40,7 @@
   const aimKnob = $("#aimKnob");
   const interactButton = $("#interactButton");
   const scannerButton = $("#scannerButton");
+  const fireButton = $("#fireButton");
   const introScreen = $("#introScreen");
   const pauseScreen = $("#pauseScreen");
   const failScreen = $("#failScreen");
@@ -223,7 +226,7 @@
     aimX: 1, aimY: 0,
     mouseX: innerWidth * 0.65, mouseY: innerHeight * 0.5,
     mouseActive: false, fireHeld: false,
-    movePointer: null, aimPointer: null,
+    movePointer: null, aimPointer: null, firePointer: null,
     moveOrigin: null, aimOrigin: null
   };
 
@@ -247,6 +250,8 @@
   let shotsFired = 0;
   let usedThruster = "PORT";
   let currentRoom = "";
+  let roomTitleTimer = 0;
+  let roomTitleHideTimer = 0;
   let pendingCinematic = 0;
   let pathRefresh = 0;
 
@@ -345,6 +350,12 @@
     shotsFired = 0;
     usedThruster = "PORT";
     currentRoom = "";
+    if (roomTitleTimer) clearTimeout(roomTitleTimer);
+    if (roomTitleHideTimer) clearTimeout(roomTitleHideTimer);
+    roomTitleTimer = 0;
+    roomTitleHideTimer = 0;
+    roomTitle.classList.remove("is-visible");
+    roomTitle.hidden = true;
     pendingCinematic = 0;
     pathRefresh = 0;
     Object.assign(player, {
@@ -389,6 +400,8 @@
     await audio.start();
     audio.play("ship-shutdown", 0.74);
     flashMessage("MAIN ENGINES OFFLINE // INTERNAL SHUTDOWN DETECTED", 3.2);
+    currentRoom = getRoomName(player.x, player.y) || "CONTROL CORRIDOR";
+    showRoomTitle(currentRoom, 1.9);
   }
 
   function pauseMission() {
@@ -497,22 +510,38 @@
     flashTimer = duration;
   }
 
+  function showRoomTitle(name, duration = 1.7) {
+    if (!name) return;
+    if (roomTitleTimer) clearTimeout(roomTitleTimer);
+    if (roomTitleHideTimer) clearTimeout(roomTitleHideTimer);
+    roomTitleText.textContent = name;
+    roomTitle.hidden = false;
+    roomTitle.classList.remove("is-visible");
+    requestAnimationFrame(() => roomTitle.classList.add("is-visible"));
+    roomTitleTimer = window.setTimeout(() => {
+      roomTitle.classList.remove("is-visible");
+      roomTitleHideTimer = window.setTimeout(() => { roomTitle.hidden = true; }, 360);
+    }, duration * 1000);
+  }
+
   function clearInput() {
     input.moveX = 0;
     input.moveY = 0;
     input.fireHeld = false;
     input.movePointer = null;
     input.aimPointer = null;
+    input.firePointer = null;
     input.moveOrigin = null;
     input.aimOrigin = null;
     moveKnob.style.transform = "translate(0px, 0px)";
     aimKnob.style.transform = "translate(0px, 0px)";
+    fireButton.classList.remove("is-firing");
     keys.clear();
   }
 
   function getRoomName(x, y) {
     const matches = walkRects.filter((rect) => rect.room && pointInRect(x, y, rect, 4));
-    return matches.length ? matches[matches.length - 1].room : "ENGINE DECK";
+    return matches.length ? matches[matches.length - 1].room : null;
   }
 
   function openDoor(door) {
@@ -1007,6 +1036,10 @@
       moveX = (keys.has("KeyD") || keys.has("ArrowRight") ? 1 : 0) - (keys.has("KeyA") || keys.has("ArrowLeft") ? 1 : 0);
       moveY = (keys.has("KeyS") || keys.has("ArrowDown") ? 1 : 0) - (keys.has("KeyW") || keys.has("ArrowUp") ? 1 : 0);
     }
+    if (input.fireHeld) {
+      moveX = 0;
+      moveY = 0;
+    }
     const moveLength = Math.hypot(moveX, moveY);
     if (moveLength > 1) { moveX /= moveLength; moveY /= moveLength; }
     const speed = player.speed * (interaction ? 0 : 1);
@@ -1096,9 +1129,9 @@
     updateHud();
 
     const room = getRoomName(player.x, player.y);
-    if (room !== currentRoom) {
+    if (room && room !== currentRoom) {
       currentRoom = room;
-      if (elapsed > 1.4) flashMessage(`DECK SECTION // ${room}`, 1.15);
+      showRoomTitle(room);
     }
 
     const cameraEase = 1 - Math.pow(0.0008, dt);
@@ -1435,7 +1468,6 @@
         input.aimX = nx / mag;
         input.aimY = ny / mag;
       }
-      input.fireHeld = mag > .38;
     }
   }
 
@@ -1462,7 +1494,6 @@
       input[kind === "move" ? "moveOrigin" : "aimOrigin"] = null;
       knob.style.transform = "translate(0px, 0px)";
       if (kind === "move") { input.moveX = 0; input.moveY = 0; }
-      else input.fireHeld = false;
       try { zone.releasePointerCapture?.(event.pointerId); } catch {}
     };
     zone.addEventListener("pointerup", release);
@@ -1507,9 +1538,34 @@
   window.addEventListener("pointerup", (event) => { if (event.pointerType === "mouse") input.fireHeld = false; });
   window.addEventListener("pointercancel", () => { input.fireHeld = false; });
   canvas.addEventListener("contextmenu", (event) => event.preventDefault());
+  ["contextmenu", "selectstart", "dragstart"].forEach((type) => {
+    document.addEventListener(type, (event) => event.preventDefault(), { passive: false });
+  });
+  document.addEventListener("gesturestart", (event) => event.preventDefault(), { passive: false });
 
   bindStick(moveZone, moveKnob, "move");
   bindStick(aimZone, aimKnob, "aim");
+
+  fireButton.addEventListener("pointerdown", (event) => {
+    event.preventDefault();
+    if (mode !== "playing" || input.firePointer !== null) return;
+    input.firePointer = event.pointerId;
+    input.fireHeld = true;
+    fireButton.classList.add("is-firing");
+    try { fireButton.setPointerCapture?.(event.pointerId); } catch {}
+    tryFire();
+  });
+  const releaseFireButton = (event) => {
+    if (input.firePointer !== event.pointerId) return;
+    input.firePointer = null;
+    input.fireHeld = false;
+    fireButton.classList.remove("is-firing");
+    try { fireButton.releasePointerCapture?.(event.pointerId); } catch {}
+  };
+  fireButton.addEventListener("pointerup", releaseFireButton);
+  fireButton.addEventListener("pointercancel", releaseFireButton);
+  fireButton.addEventListener("lostpointercapture", releaseFireButton);
+
   interactButton.addEventListener("pointerdown", (event) => { event.preventDefault(); tryInteract(); });
   scannerButton.addEventListener("pointerdown", (event) => { event.preventDefault(); pulseScanner(); });
 
