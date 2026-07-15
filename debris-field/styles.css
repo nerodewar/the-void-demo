@@ -274,4 +274,23 @@ button { font: inherit; color: inherit; }
   .warning-banner { min-width: 330px; }
   .radar-panel, .objective-panel { width: 180px; }
   .bottom-strip { left: 15%; right: 15%; }
+
+  
+  .dpad-ring {
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.dpad-ring .control-button,
+.dpad-ring .dpad-core {
+  pointer-events: none;
+}
+
+.fire-button {
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
