@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+  <meta name="theme-color" content="#020305">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>The Void: Hunt 01</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preload" href="assets/map/hunt01-map.svg" as="image">
+  <link rel="preload" href="assets/sprites/luna-walk.png" as="image">
+  <link rel="preload" href="assets/sprites/alien.png" as="image">
+</head>
+<body>
+  <main class="hunt-shell" id="huntShell">
+    <canvas id="gameCanvas" aria-label="Top-down alien hunt game"></canvas>
+
+    <section class="hud" id="hud" hidden aria-live="polite">
+      <div class="hud-left">
+        <div class="hud-brand"><span>THE VOID // CHAPTER TWO</span><strong>HUNT 01: ENGINE KILL</strong></div>
+        <div class="suit-block"><span>SUIT INTEGRITY</span><div class="suit-pips" id="suitPips"><i></i><i></i><i></i></div></div>
+      </div>
+      <div class="timer-wrap"><span>MISSION WINDOW</span><strong id="timerText">05:00</strong><div class="timer-track"><i id="timerBar"></i></div></div>
+      <div class="hud-right">
+        <div class="ammo-block"><span>PLASMA CELLS</span><strong id="ammoText">12 / 12</strong><div class="ammo-pips" id="ammoPips"></div></div>
+        <button class="hud-button" id="muteButton" type="button" aria-label="Mute audio">AUDIO ON</button>
+        <button class="hud-button" id="pauseButton" type="button">PAUSE</button>
+      </div>
+    </section>
+
+    <aside class="objective-panel" id="objectivePanel" hidden>
+      <span>CURRENT DIRECTIVE</span>
+      <strong id="objectiveText">Reach the Power Relay Room</strong>
+      <small id="objectiveHint">Restore engine-deck power before the organism closes in.</small>
+    </aside>
+
+    <section class="tracker" id="tracker" hidden aria-label="Biological motion tracker">
+      <div class="tracker-radar"><i id="trackerSweep"></i><b id="trackerBlip"></b></div>
+      <div><span>BIOLOGICAL RANGE</span><strong id="trackerDistance">-- M</strong></div>
+    </section>
+
+    <div class="interaction-prompt" id="interactionPrompt" hidden>
+      <span id="interactionKey">E</span>
+      <strong id="interactionLabel">INTERACT</strong>
+      <div class="interaction-progress"><i id="interactionProgress"></i></div>
+    </div>
+
+    <div class="message-flash" id="messageFlash" hidden></div>
+    <div class="damage-flash" id="damageFlash" aria-hidden="true"></div>
+    <div class="charge-flash" id="chargeFlash" aria-hidden="true"></div>
+
+    <section class="touch-controls" id="touchControls" hidden aria-label="Touch controls">
+      <div class="stick-zone move-zone" id="moveZone"><div class="stick-ring"><i id="moveKnob"></i></div><span>MOVE</span></div>
+      <div class="touch-center-actions">
+        <button class="touch-button scanner-button" id="scannerButton" type="button">PULSE</button>
+        <button class="touch-button interact-button" id="interactButton" type="button">INTERACT</button>
+      </div>
+      <div class="stick-zone aim-zone" id="aimZone"><div class="stick-ring"><i id="aimKnob"></i></div><span>AIM + FIRE</span></div>
+    </section>
+
+    <section class="screen intro-screen is-visible" id="introScreen">
+      <img src="assets/images/hunt01-concept-map.png" alt="Top-down plan of the engine deck" class="screen-backdrop">
+      <div class="screen-shade"></div>
+      <article class="briefing-card">
+        <p class="screen-kicker">CHAPTER TWO // INTERNAL SABOTAGE</p>
+        <h1>HUNT MODE</h1>
+        <h2>HUNT 01: ENGINE KILL</h2>
+        <p class="briefing-copy">The ship has ground to a halt. Both engines were shut down from inside the vessel. Restore engine control, prime either thruster, then lure the organism into the firing chamber.</p>
+        <div class="briefing-grid">
+          <div><span>WEAPON</span><strong>PLASMA GUN</strong><small>Slows and stuns. It cannot kill the organism.</small></div>
+          <div><span>RECHARGE</span><strong>STORAGE ROOM</strong><small>Recharging takes time and leaves Luna exposed.</small></div>
+          <div><span>MISSION LIMIT</span><strong>05:00</strong><small>Failure ends the hunt and resets the level.</small></div>
+          <div><span>EXECUTION</span><strong>EITHER THRUSTER</strong><small>Lead the target into the marked ignition zone.</small></div>
+        </div>
+        <div class="control-copy"><span>DESKTOP: WASD + MOUSE + CLICK + E</span><span>IPAD: LEFT STICK + RIGHT AIM/FIRE + INTERACT</span></div>
+        <div class="screen-actions">
+          <button class="primary-button" id="startButton" type="button">ENTER HUNT MODE</button>
+          <button class="secondary-button menu-return" type="button">RETURN TO MAIN MENU</button>
+        </div>
+      </article>
+    </section>
+
+    <section class="screen pause-screen" id="pauseScreen" hidden>
+      <article class="compact-card">
+        <p class="screen-kicker">MISSION SUSPENDED</p>
+        <h2>PAUSED</h2>
+        <div class="screen-actions vertical">
+          <button class="primary-button" id="resumeButton" type="button">RESUME HUNT</button>
+          <button class="secondary-button" id="pauseRestartButton" type="button">RESTART MISSION</button>
+          <button class="secondary-button menu-return" type="button">EXIT TO MAIN MENU</button>
+        </div>
+      </article>
+    </section>
+
+    <section class="screen result-screen" id="failScreen" hidden>
+      <article class="compact-card fail-card">
+        <p class="screen-kicker">HUNT PROTOCOL // FAILED</p>
+        <h2 id="failTitle">MISSION WINDOW EXPIRED</h2>
+        <p id="failCopy">The engines remain offline. The organism vanishes deeper into the vessel.</p>
+        <div class="screen-actions vertical">
+          <button class="primary-button" id="retryButton" type="button">RESTART HUNT 01</button>
+          <button class="secondary-button menu-return" type="button">EXIT TO MAIN MENU</button>
+        </div>
+      </article>
+    </section>
+
+    <section class="screen cinematic-screen" id="cinematicScreen" hidden>
+      <img src="assets/images/thruster-cinematic.png" alt="Luna ignites a thruster and blasts the black sludgy organism apart" class="cinematic-image">
+      <div class="cinematic-burn"></div>
+      <div class="cinematic-copy"><span>THRUSTER IGNITION // MANUAL OVERRIDE</span><strong>TARGET INCINERATED</strong></div>
+    </section>
+
+    <section class="screen result-screen" id="successScreen" hidden>
+      <img src="assets/images/thruster-cinematic.png" alt="The organism destroyed by the ship thruster" class="screen-backdrop">
+      <div class="screen-shade"></div>
+      <article class="compact-card success-card">
+        <p class="screen-kicker">HUNT PROTOCOL // COMPLETE</p>
+        <h2>ENGINE KILL</h2>
+        <div class="result-stats">
+          <div><span>TIME REMAINING</span><strong id="resultTime">00:00</strong></div>
+          <div><span>PLASMA FIRED</span><strong id="resultShots">0</strong></div>
+          <div><span>THRUSTER USED</span><strong id="resultThruster">PORT</strong></div>
+        </div>
+        <p class="success-alert">MAIN PROPULSION RESTORED // ADDITIONAL ANOMALIES DETECTED</p>
+        <div class="screen-actions vertical">
+          <button class="primary-button" id="replayButton" type="button">REPLAY HUNT 01</button>
+          <button class="secondary-button menu-return" type="button">RETURN TO MAIN MENU</button>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script src="game.js"></script>
+</body>
+</html>
