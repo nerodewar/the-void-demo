@@ -2496,6 +2496,8 @@ dialog::backdrop {
   border: 1px solid rgba(219,237,255,.2);
   color: #eff7ff;
   text-align: left;
+  text-decoration: none;
+  box-sizing: border-box;
   background: linear-gradient(90deg, rgba(121,190,238,.11), rgba(255,255,255,.015));
   cursor: pointer;
   transition: transform .22s var(--ease-cinematic), border-color .22s ease, background .22s ease, color .22s ease;

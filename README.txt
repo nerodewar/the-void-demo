@@ -1,4 +1,4 @@
-THE VOID DEMO v1.1.0 — HUNT MODE BUILD
+THE VOID DEMO v1.1.1 — HUNT MODE BUILD
 
 Added:
 - HUNT 01: ENGINE KILL as a standalone top-down Chapter Two prototype on the main title screen.

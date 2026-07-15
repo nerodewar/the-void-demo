@@ -275,6 +275,26 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
+  // Code and configuration files are network-first. This prevents a newly
+  // deployed HTML shell from being paired with stale JavaScript from an older
+  // installed PWA. Offline play still falls back to the current/previous cache.
+  const isCodeAsset = /\.(?:js|css|json|webmanifest)$/i.test(url.pathname);
+  if (isCodeAsset) {
+    event.respondWith((async () => {
+      const cache = await caches.open(CACHE_VERSION);
+      try {
+        const response = await fetch(new Request(event.request, { cache: "reload" }));
+        if (response.ok) await cache.put(event.request, response.clone());
+        return response;
+      } catch {
+        return await cache.match(event.request, { ignoreSearch: true })
+          || await caches.match(event.request, { ignoreSearch: true })
+          || Response.error();
+      }
+    })());
+    return;
+  }
+
   event.respondWith((async () => {
     const cache = await caches.open(CACHE_VERSION);
     const cached = await cache.match(event.request, { ignoreSearch: true })

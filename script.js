@@ -5689,9 +5689,10 @@ No command source is identified.`, button: "CONTINUE", presentation: "restored",
     fadeTitleMusicOut(420);
     window.location.href = "debris-field/index.html?autostart=1&return=../index.html";
   });
+  // Hunt 01 is a real HTML link so it still launches if a previously installed
+  // PWA briefly serves an older copy of this script. JS only handles the audio fade.
   hunt01Button?.addEventListener("click", () => {
-    fadeTitleMusicOut(420);
-    window.location.href = "hunt01/index.html?autostart=1&return=../index.html";
+    fadeTitleMusicOut(220);
   });
   creditsButton.addEventListener("click", () => openCreditsSequence());
   creditsMuteButton?.addEventListener("click", toggleCreditsMute);
