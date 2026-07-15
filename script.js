@@ -240,9 +240,6 @@
   const sequenceButton = document.getElementById("sequenceButton");
   const chapterDialog = document.getElementById("chapterDialog");
   const closeChapterButton = document.getElementById("closeChapterButton");
-  const branchDialog = document.getElementById("branchDialog");
-  const signalChoiceButton = document.getElementById("signalChoiceButton");
-  const aloneChoiceButton = document.getElementById("aloneChoiceButton");
   const finalGroundDialog = document.getElementById("finalGroundDialog");
   const finalLunaText = document.getElementById("finalLunaText");
   const finalGroundText = document.getElementById("finalGroundText");
@@ -353,6 +350,20 @@
     candidate.oxygenMinutesRemaining = Math.max(0, Math.min(Number(candidate.oxygenMinutesRemaining) || 1440, 1440));
     candidate.earthMinutesRemaining = Math.max(0, Math.min(Number(candidate.earthMinutesRemaining) || 2880, 2880));
     candidate.rebreatherSeconds = Math.max(0, Math.min(Number(candidate.rebreatherSeconds) || 90, 90));
+
+    // v1.0.6 removes the post-hiding distress-call branch. Any unfinished
+    // legacy save on that route resumes at Checkpoint 02 and enters the
+    // retained maintenance / sat-nav component replacement storyline.
+    if (candidate.branch === "signal" && !candidate.finalReported && !candidate.blackoutStarted && !candidate.actTwoComplete) {
+      candidate.branch = "alone";
+      candidate.engineRepaired = false;
+      candidate.lightsOut = false;
+      candidate.satNavFailed = false;
+      candidate.satNavDiagnosed = false;
+      candidate.satNavModule = false;
+      candidate.satNavRepaired = false;
+      candidate.currentRoom = "tunnels";
+    }
 
     // v0.5.2 removes the Auxiliary Power scavenger chain. Old saves are
     // folded into the single-relay Checkpoint 03 route.
@@ -2734,7 +2745,7 @@
     if (!state.hideChoice) return "Run to Engineering and choose a hiding place";
     if (!state.hidingCompleted) return "Remain silent and avoid detection";
     if (!state.equipmentTaken) return "Search the Store Room for the flashlight and plasma gun";
-    return "Choose whether to send a crisis signal or face Engineering alone";
+    return "Enter the maintenance route and inspect the engineering systems";
   }
 
   function updateThreatReadout() {
@@ -3337,7 +3348,7 @@
       }
       let text = "The Engineering door unlocks. Inside, machinery divides the room into pockets of deep shadow. Luna hears the creature entering the corridor behind her. She has seconds to choose a hiding place.";
       if (state.hidingInProgress) text = `${getHideDescription()}\n\nA voice speaks from the doorway in Luna's exact tone: \"Luna... Ground Control requires confirmation.\"`;
-      if (state.hidingCompleted) text = "The creature has moved deeper into the ship. A diagnostic screen beside Luna has awakened by itself.\n\nCREW DETECTED: 02.\n\nLuna must decide whether to return to Control and send a crisis signal, or move into the engineering systems alone.";
+      if (state.hidingCompleted) text = "The creature has moved deeper into the ship. A diagnostic screen beside Luna has awakened by itself.\n\nCREW DETECTED: 02.\n\nLuna opens the maintenance access. She must move deeper into the engineering systems and find out what the organism has damaged.";
       return {
         code: "EN-07",
         title: "ENGINEERING",
@@ -3512,7 +3523,7 @@
       if (state.hidingCompleted) {
         if (!state.equipmentTaken) return [{ label: "SEARCH THE STORE ROOM", meta: "FLASHLIGHT + PLASMA GUN", special: true, onClick: () => moveToRoom("store") }];
         return [
-          { label: "CHOOSE LUNA'S NEXT MOVE", meta: "MAJOR DECISION", special: true, onClick: () => openDialog(branchDialog) },
+          { label: "ENTER MAINTENANCE ROUTE", meta: "ENGINEERING SYSTEMS", special: true, onClick: startAloneBranch },
           { label: "REVIEW CHECKPOINT 02", meta: "STATUS", onClick: () => openDialog(chapterDialog) }
         ];
       }
@@ -4052,53 +4063,7 @@
     );
   }
 
-  function startSignalBranch() {
-    closeDialog(branchDialog);
-    closeDialog(chapterDialog);
-    state.branch = "signal";
-    state.mapMode = "signal_engine";
-    state.currentRoom = "control";
-    state.stress = Math.max(state.stress, 73);
-    saveState();
-
-    runSequence(
-      [
-        {
-          image: "assets/IMG04.png",
-          alt: "Luna sends an emergency crisis signal from the Control Room.",
-          code: "DEEP SPACE RELAY // PRIORITY CRISIS",
-          title: "THE SIGNAL LEAVES THE SHIP",
-          text: story("startsignalbranch.theSignalLeavesTheShip", { state, clocks: typeof clocks !== "undefined" ? clocks : "", checkpointText: typeof checkpointText !== "undefined" ? checkpointText : "" }),
-          button: "CONTINUE"
-        },
-        {
-          image: "assets/IMG17.png",
-          alt: "The compact engine room of Luna's ship as Engine 02 begins to fail.",
-          code: "ENGINE 02 // THRUST COLLAPSE",
-          title: "A SECOND CRISIS",
-          text: story("startsignalbranch.aSecondCrisis", { state, clocks: typeof clocks !== "undefined" ? clocks : "", checkpointText: typeof checkpointText !== "undefined" ? checkpointText : "" }),
-          button: "OPEN MISSION MAP"
-        }
-      ],
-      async () => {
-        await runCinematicTransition({
-          kicker: "MISSION ROUTE // CRITICAL FAILURE",
-          title: "ENGINE 02 ROUTE ISOLATED",
-          text: story("startsignalbranch.engine02RouteIsolated", { state, clocks: typeof clocks !== "undefined" ? clocks : "", checkpointText: typeof checkpointText !== "undefined" ? checkpointText : "" }),
-          duration: 900,
-          task: async () => {
-            armMapReveal();
-            updateInterface();
-            await showRoom("control", { immediate: true });
-          }
-        });
-        showToast("MISSION ROUTE UPDATED // ENGINE 02 FAILURE");
-      }
-    );
-  }
-
   function startAloneBranch() {
-    closeDialog(branchDialog);
     closeDialog(chapterDialog);
     state.branch = "alone";
     state.mapMode = "alone_engine";
@@ -4111,15 +4076,15 @@
         {
           image: "assets/IMG15.png",
           alt: "Luna moves alone into the engineering maintenance route.",
-          code: "ENGINEERING ACCESS // TRANSMITTER SILENT",
-          title: "NO SIGNAL",
+          code: "ENGINEERING ACCESS // MAINTENANCE ROUTE",
+          title: "INTO THE SHIP",
           text: story("startalonebranch.noSignal", { state, clocks: typeof clocks !== "undefined" ? clocks : "", checkpointText: typeof checkpointText !== "undefined" ? checkpointText : "" }),
           button: "ENTER MAINTENANCE ROUTE"
         }
       ],
       async () => {
         await runCinematicTransition({
-          kicker: "MISSION ROUTE // TRANSMITTER SILENT",
+          kicker: "MISSION ROUTE // ENGINEERING SYSTEMS",
           title: "MAINTENANCE ROUTE ISOLATED",
           text: story("startalonebranch.maintenanceRouteIsolated", { state, clocks: typeof clocks !== "undefined" ? clocks : "", checkpointText: typeof checkpointText !== "undefined" ? checkpointText : "" }),
           duration: 850,
@@ -4129,7 +4094,7 @@
             await showRoom("tunnels", { immediate: true });
           }
         });
-        showToast("MISSION ROUTE UPDATED // ENGINEERING ACCESS ONLY");
+        showToast("MISSION ROUTE UPDATED // SAT-NAV DIAGNOSTICS AHEAD");
       }
     );
   }
@@ -5742,12 +5707,7 @@ No command source is identified.`, button: "CONTINUE", presentation: "restored",
   continueButton.addEventListener("click", advanceIntro);
   acknowledgeGroundButton.addEventListener("click", acknowledgeGroundControl);
   sequenceButton.addEventListener("click", advanceSequence);
-  closeChapterButton.addEventListener("click", () => {
-    closeDialog(chapterDialog);
-    openDialog(branchDialog);
-  });
-  signalChoiceButton.addEventListener("click", startSignalBranch);
-  aloneChoiceButton.addEventListener("click", startAloneBranch);
+  closeChapterButton.addEventListener("click", startAloneBranch);
   acknowledgeFinalButton.addEventListener("click", beginBlackoutAct);
   restartButton.addEventListener("click", restartGame);
   demoEndTitleButton?.addEventListener("click", returnFromDemoEndToTitle);

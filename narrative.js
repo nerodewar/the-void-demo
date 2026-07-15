@@ -92,7 +92,7 @@ REBREATHER: ${formatRebreatherTime(state.rebreatherSeconds)}. Luna must open the
             ? "The only path to the Main Engine Room is a narrow service passage threaded through the ship's machinery."
             : state.satNavFailed
               ? "The maintenance route leads back toward Control. Navigation warnings pulse through Luna's suit as the ship drifts away from its Earth approach vector."
-              : "Luna leaves the transmitter silent and moves into the maintenance access alone. The tunnels magnify every breath and every soft movement travelling through the hull."),
+              : "Luna moves into the maintenance access. The tunnels magnify every breath and every soft movement travelling through the hull as she follows the engineering-system warnings."),
     "getroomdefinition.mainEngineRoom": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("The engine room is in total darkness..."),
     "getroomdefinition.mainEngineRoom2": ({ state = {}, clocks = "", checkpointText = "" } = {}) => (state.branch === "signal"
           ? "Engine 02 grinds to a complete stop. Luna must replace the damaged regulator manually to get it running again."
@@ -160,7 +160,7 @@ REBREATHER: ${formatRebreatherTime(state.rebreatherSeconds)}. Luna must open the
     "startsignalbranch.engine02RouteIsolated": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Contracting the schematic to Control, Maintenance Tunnels and Main Engine Room"),
 
     // ALONE BRANCH
-    "startalonebranch.noSignal": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Luna leaves the crisis transmitter untouched. If the organism is moving through the ship, she cannot afford to announce where she is.\n\nShe opens the maintenance access and enters the tunnels alone."),
+    "startalonebranch.noSignal": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("The organism has moved deeper into the ship. Luna opens the maintenance access and enters the narrow engineering route, following the first system warnings into the darkness."),
     "startalonebranch.maintenanceRouteIsolated": ({ state = {}, clocks = "", checkpointText = "" } = {}) => ("Reconstructing the immediate route through Engineering"),
 
     // ENGINE REPAIR

@@ -1,3 +1,14 @@
+THE VOID DEMO v1.0.6 — CHAPTER ONE ROUTE AMENDMENT
+
+Changed:
+- Removed the post-hiding distress/crisis-signal decision screen.
+- Checkpoint 02 now continues directly into the maintenance route.
+- The retained route leads to the sat-nav failure, component diagnosis and EVA replacement sequence.
+- Unfinished legacy saves on the removed branch are redirected into the retained route.
+- Offline service-worker cache advanced to v1.1.5.
+
+Previous release notes follow.
+
 THE VOID DEMO v1.0.4 — LAUNCH STABILITY UPDATE
 
 Fixed:

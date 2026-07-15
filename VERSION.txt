@@ -1,13 +1,10 @@
-The Void Demo v1.0.5 Offline iPad PWA
+The Void Demo v1.0.6 Offline iPad PWA
 
-Debris Field integration:
-- Added “The Void: Debris Field Mini-game” to the main title menu.
-- Removed the mini-game tutorial/meteor score briefing page.
-- Mini-game begins immediately after its assets initialise.
-- Increased meteor pressure by 20% while preserving safe spawn spacing.
-- Added the supplied Cloudflare-hosted Proton music track.
-- Results screen returns directly to The Void main title.
-- Mini-game code and assets are included in the main offline archive.
-- Main campaign content and progression remain otherwise unchanged.
+Chapter One route amendment:
+- Removed the post-hiding SEND CRISIS SIGNAL choice and its accessible storyline.
+- Checkpoint 02 now continues directly into the maintenance route.
+- Luna proceeds through the engineering systems, discovers satellite navigation is offline, diagnoses the failed component, and follows the existing replacement-module/EVA repair sequence.
+- Unfinished legacy saves on the removed branch are redirected to the retained sat-nav route.
+- Service-worker cache updated to v1.1.5.
 
-Launch-stability repair retained from v1.0.4.
+All previous offline PWA, Debris Field, control, narrative, audio and checkpoint fixes are retained.
