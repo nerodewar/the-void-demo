@@ -1,2 +1,2 @@
-The Void Demo v1.1.4
-Hunt 01 interaction, facing and map-space update
+The Void Demo v1.1.5
+Hunt 01 clean floorplan and collision-wall update
