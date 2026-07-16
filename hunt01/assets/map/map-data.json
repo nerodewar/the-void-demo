@@ -1,15 +1,112 @@
 {
   "world": {
-    "width": 2900,
-    "height": 2150
+    "width": 3000,
+    "height": 2200
   },
   "playerSpawn": {
     "x": 390,
-    "y": 230
+    "y": 240
   },
   "alienSpawn": {
-    "x": 1680,
-    "y": 225
+    "x": 1840,
+    "y": 240
   },
-  "note": "v1.1.6 spread-out floorplan; runtime geometry is authoritative in hunt01/game.js"
+  "rooms": [
+    {
+      "id": "control",
+      "label": "CONTROL CORRIDOR",
+      "x": 110,
+      "y": 110,
+      "w": 680,
+      "h": 260
+    },
+    {
+      "id": "junction",
+      "label": "EMERGENCY JUNCTION",
+      "x": 950,
+      "y": 90,
+      "w": 420,
+      "h": 390
+    },
+    {
+      "id": "maintenanceHall",
+      "label": "MAINTENANCE HALL",
+      "x": 1510,
+      "y": 110,
+      "w": 680,
+      "h": 260
+    },
+    {
+      "id": "relay",
+      "label": "POWER RELAY ROOM",
+      "x": 2330,
+      "y": 80,
+      "w": 540,
+      "h": 360
+    },
+    {
+      "id": "coolant",
+      "label": "COOLANT ACCESS",
+      "x": 90,
+      "y": 570,
+      "w": 490,
+      "h": 360
+    },
+    {
+      "id": "storage",
+      "label": "STORAGE ROOM",
+      "x": 620,
+      "y": 620,
+      "w": 460,
+      "h": 360
+    },
+    {
+      "id": "tunnel",
+      "label": "MAINTENANCE TUNNEL",
+      "x": 970,
+      "y": 670,
+      "w": 560,
+      "h": 710
+    },
+    {
+      "id": "engine",
+      "label": "ENGINE ROOM",
+      "x": 970,
+      "y": 1470,
+      "w": 560,
+      "h": 480
+    },
+    {
+      "id": "portAccess",
+      "label": "PORT ENGINE ACCESS",
+      "x": 400,
+      "y": 1570,
+      "w": 600,
+      "h": 300
+    },
+    {
+      "id": "starboardAccess",
+      "label": "STARBOARD ENGINE ACCESS",
+      "x": 1500,
+      "y": 1570,
+      "w": 600,
+      "h": 300
+    },
+    {
+      "id": "portThruster",
+      "label": "PORT THRUSTER CHAMBER",
+      "x": 50,
+      "y": 1420,
+      "w": 410,
+      "h": 710
+    },
+    {
+      "id": "starboardThruster",
+      "label": "STARBOARD THRUSTER CHAMBER",
+      "x": 2040,
+      "y": 1420,
+      "w": 410,
+      "h": 710
+    }
+  ]
 }

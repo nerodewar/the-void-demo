@@ -1,55 +1,52 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="2900" height="2150" viewBox="0 0 2900 2150">
+<svg xmlns="http://www.w3.org/2000/svg" width="3000" height="2200" viewBox="0 0 3000 2200">
 <defs>
-  <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#091018"/><stop offset="1" stop-color="#020507"/></linearGradient>
-  <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#3a4650"/><stop offset=".5" stop-color="#222c34"/><stop offset="1" stop-color="#11171c"/></linearGradient>
-  <linearGradient id="hot" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#43372f"/><stop offset="1" stop-color="#171615"/></linearGradient>
-  <linearGradient id="cool" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#183b4b"/><stop offset="1" stop-color="#0a202b"/></linearGradient>
-  <linearGradient id="silver" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f4f7f9"/><stop offset=".2" stop-color="#8d9aa3"/><stop offset=".5" stop-color="#d9e0e4"/><stop offset=".8" stop-color="#65737d"/><stop offset="1" stop-color="#c9d1d6"/></linearGradient>
-  <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse"><rect width="50" height="50" fill="none" stroke="#cad6de" stroke-opacity=".14"/><circle cx="7" cy="7" r="2" fill="#dce4e9" opacity=".16"/></pattern>
-  <pattern id="grate" width="28" height="28" patternUnits="userSpaceOnUse"><rect width="28" height="28" fill="#11181d"/><path d="M0 0L28 28M28 0L0 28" stroke="#71808a" stroke-width="2" opacity=".42"/></pattern>
-  <pattern id="hazard" width="40" height="40" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="20" height="40" fill="#c77b24"/><rect x="20" width="20" height="40" fill="#12171b"/></pattern>
-  <filter id="shadow"><feDropShadow dx="0" dy="13" stdDeviation="16" flood-color="#000" flood-opacity=".86"/></filter>
-  <filter id="glow"><feGaussianBlur stdDeviation="7" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#071018"/><stop offset="1" stop-color="#010407"/></linearGradient>
+  <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#3d4a54"/><stop offset=".55" stop-color="#252f37"/><stop offset="1" stop-color="#12191f"/></linearGradient>
+  <linearGradient id="hot" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#493b31"/><stop offset="1" stop-color="#181717"/></linearGradient>
+  <linearGradient id="cool" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#194456"/><stop offset="1" stop-color="#0b232e"/></linearGradient>
+  <linearGradient id="silver" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f5f8fa"/><stop offset=".18" stop-color="#9ba8b0"/><stop offset=".48" stop-color="#e2e8eb"/><stop offset=".78" stop-color="#6f7d86"/><stop offset="1" stop-color="#cad3d8"/></linearGradient>
+  <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse"><rect width="48" height="48" fill="none" stroke="#d6e0e6" stroke-opacity=".16"/><circle cx="7" cy="7" r="2.2" fill="#e7edf0" opacity=".16"/></pattern>
+  <pattern id="grate" width="28" height="28" patternUnits="userSpaceOnUse"><rect width="28" height="28" fill="#121a20"/><path d="M0 0L28 28M28 0L0 28" stroke="#788892" stroke-width="2" opacity=".42"/></pattern>
+  <pattern id="hazard" width="40" height="40" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="20" height="40" fill="#c67b25"/><rect x="20" width="20" height="40" fill="#12171b"/></pattern>
+  <filter id="shadow"><feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#000" flood-opacity=".85"/></filter>
+  <filter id="glow"><feGaussianBlur stdDeviation="8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
   <style>
-    .shell{fill:url(#silver);stroke:#303b43;stroke-width:8;filter:url(#shadow)}
-    .floor{fill:url(#floor);stroke:#202931;stroke-width:4}.hot{fill:url(#hot)}.cool{fill:url(#cool)}
-    .grid{fill:url(#grid)}.cShell{fill:url(#silver);stroke:#303b43;stroke-width:7;filter:url(#shadow)}.cFloor{fill:url(#grate)}
-    .machine{fill:#141b20;stroke:#71808a;stroke-width:8}.panel{fill:#071018;stroke:#64747e;stroke-width:6}
-    .blue{fill:#2bbcff;filter:url(#glow)}.red{fill:#ff3f28;filter:url(#glow)}.amber{fill:#ffad38;filter:url(#glow)}
+    .shell{fill:url(#silver);stroke:#334149;stroke-width:9;filter:url(#shadow)}
+    .floor{fill:url(#floor);stroke:#202b33;stroke-width:4}.floor.hot{fill:url(#hot)}.floor.cool{fill:url(#cool)}
+    .grid{fill:url(#grid)}.corridorShell{fill:url(#silver);stroke:#334149;stroke-width:8;filter:url(#shadow)}.corridorFloor{fill:url(#grate)}
+    .machine{fill:#151d23;stroke:#788892;stroke-width:8}.panel{fill:#071119;stroke:#6c7d87;stroke-width:6}
+    .blue{fill:#31c2ff;filter:url(#glow)}.red{fill:#ff452f;filter:url(#glow)}.amber{fill:#ffb13f;filter:url(#glow)}
   </style>
 </defs>
-<rect width="2900" height="2150" fill="url(#bg)"/>
+<rect width="3000" height="2200" fill="url(#bg)"/>
 
-<!-- Upper navigation chain, intentionally spaced with distinct connector halls. -->
-<g id="control"><rect class="shell" x="90" y="105" width="660" height="245" rx="38"/><rect class="floor" x="120" y="135" width="600" height="185" rx="22"/><rect class="grid" x="120" y="135" width="600" height="185" rx="22"/></g>
-<g><rect class="cShell" x="700" y="170" width="195" height="125" rx="18"/><rect class="cFloor" x="720" y="190" width="155" height="85" rx="10"/></g>
-<g id="junction"><path class="shell" d="M925 95H1155L1235 175V345L1155 425H925L845 345V175Z"/><path class="floor" d="M950 125H1130L1205 205V315L1130 395H950L875 315V205Z"/><path class="grid" d="M950 125H1130L1205 205V315L1130 395H950L875 315V205Z"/></g>
-<g><rect class="cShell" x="1185" y="170" width="210" height="125" rx="18"/><rect class="cFloor" x="1205" y="190" width="170" height="85" rx="10"/></g>
-<g id="maintenance-hall"><rect class="shell" x="1345" y="105" width="620" height="245" rx="38"/><rect class="floor" x="1375" y="135" width="560" height="185" rx="22"/><rect class="grid" x="1375" y="135" width="560" height="185" rx="22"/></g>
-<g><rect class="cShell" x="1915" y="170" width="205" height="125" rx="18"/><rect class="cFloor" x="1935" y="190" width="165" height="85" rx="10"/></g>
-<g id="relay"><rect class="shell" x="2070" y="75" width="710" height="390" rx="42"/><rect class="floor hot" x="2100" y="105" width="650" height="330" rx="24"/><rect class="grid" x="2100" y="105" width="650" height="330" rx="24"/><rect class="machine" x="2350" y="205" width="125" height="115" rx="20"/><circle class="blue" cx="2590" cy="270" r="14"/></g>
+<!-- Upper deck. Long connectors make the route readable and prevent room shells from stacking. -->
+<g id="control-corridor"><rect class="shell" x="110" y="110" width="680" height="260" rx="40"/><rect class="floor" x="140" y="140" width="620" height="200" rx="24"/><rect class="grid" x="140" y="140" width="620" height="200" rx="24"/></g>
+<g><rect class="corridorShell" x="750" y="175" width="240" height="130" rx="18"/><rect class="corridorFloor" x="760" y="195" width="220" height="90" rx="8"/></g>
+<g id="emergency-junction"><path class="shell" d="M1040 90H1280L1370 180V390L1280 480H1040L950 390V180Z"/><path class="floor" d="M1070 120H1250L1340 210V360L1250 450H1070L980 360V210Z"/><path class="grid" d="M1070 120H1250L1340 210V360L1250 450H1070L980 360V210Z"/></g>
+<g><rect class="corridorShell" x="1330" y="175" width="220" height="130" rx="18"/><rect class="corridorFloor" x="1340" y="195" width="200" height="90" rx="8"/></g>
+<g id="maintenance-hall"><rect class="shell" x="1510" y="110" width="680" height="260" rx="40"/><rect class="floor" x="1540" y="140" width="620" height="200" rx="24"/><rect class="grid" x="1540" y="140" width="620" height="200" rx="24"/></g>
+<g><rect class="corridorShell" x="2150" y="175" width="220" height="130" rx="18"/><rect class="corridorFloor" x="2160" y="195" width="200" height="90" rx="8"/></g>
+<g id="power-relay-room"><rect class="shell" x="2330" y="80" width="540" height="360" rx="44"/><rect class="floor hot" x="2360" y="110" width="480" height="300" rx="26"/><rect class="grid" x="2360" y="110" width="480" height="300" rx="26"/><rect class="machine" x="2500" y="205" width="125" height="105" rx="20"/><circle class="blue" cx="2730" cy="260" r="15"/></g>
 
-<!-- Support wing with broad, clean doors. -->
-<g><rect class="cShell" x="240" y="300" width="170" height="270" rx="20"/><rect class="cFloor" x="265" y="320" width="120" height="230" rx="12"/></g>
-<g id="coolant"><rect class="shell" x="75" y="520" width="560" height="390" rx="42"/><rect class="floor cool" x="105" y="550" width="500" height="330" rx="24"/><rect class="grid" x="105" y="550" width="500" height="330" rx="24"/><path d="M165 590V840M255 580V850M535 580V850" fill="none" stroke="#526773" stroke-width="18"/><circle class="blue" cx="175" cy="835" r="13"/></g>
-<g><rect class="cShell" x="580" y="630" width="200" height="150" rx="20"/><rect class="cFloor" x="605" y="655" width="150" height="100" rx="12"/></g>
-<g id="storage"><rect class="shell" x="725" y="520" width="500" height="390" rx="42"/><rect class="floor" x="755" y="550" width="440" height="330" rx="24"/><rect class="grid" x="755" y="550" width="440" height="330" rx="24"/><rect class="machine" x="870" y="660" width="110" height="95" rx="18"/><rect class="panel" x="1040" y="650" width="110" height="130" rx="16"/><rect class="blue" x="1065" y="675" width="60" height="58" rx="10"/></g>
-<g><rect class="cShell" x="940" y="370" width="200" height="205" rx="20"/><rect class="cFloor" x="965" y="395" width="150" height="155" rx="12"/></g>
+<!-- Separated utility rooms. -->
+<g><rect class="corridorShell" x="250" y="330" width="180" height="290" rx="20"/><rect class="corridorFloor" x="270" y="340" width="140" height="260"/></g>
+<g id="coolant-access"><rect class="shell" x="90" y="570" width="490" height="360" rx="44"/><rect class="floor cool" x="120" y="600" width="430" height="300" rx="26"/><rect class="grid" x="120" y="600" width="430" height="300" rx="26"/><path d="M185 640V860M280 625V875M485 625V875" fill="none" stroke="#5c7380" stroke-width="18"/><circle class="blue" cx="190" cy="850" r="13"/></g>
+<g><rect class="corridorShell" x="540" y="715" width="120" height="160" rx="18"/><rect class="corridorFloor" x="550" y="735" width="100" height="120"/></g>
+<g id="storage-room"><rect class="shell" x="620" y="620" width="460" height="360" rx="44"/><rect class="floor" x="650" y="650" width="400" height="300" rx="26"/><rect class="grid" x="650" y="650" width="400" height="300" rx="26"/><rect class="machine" x="720" y="740" width="110" height="100" rx="18"/><rect class="panel" x="885" y="755" width="95" height="120" rx="16"/><rect class="blue" x="905" y="780" width="55" height="54" rx="9"/></g>
+<g><rect class="corridorShell" x="1040" y="715" width="180" height="160" rx="18"/><rect class="corridorFloor" x="1050" y="735" width="150" height="120"/></g>
 
-<!-- Central route. Large empty gaps prevent visual bunching. -->
-<g><rect class="cShell" x="1425" y="290" width="210" height="230" rx="22"/><rect class="cFloor" x="1450" y="300" width="160" height="200" rx="12"/></g>
-<g id="tunnel"><rect class="shell" x="1295" y="470" width="470" height="670" rx="42"/><rect class="floor" x="1325" y="500" width="410" height="610" rx="24"/><rect class="grid" x="1325" y="500" width="410" height="610" rx="24"/><rect x="1365" y="550" width="330" height="16" fill="url(#hazard)"/><rect x="1365" y="1040" width="330" height="16" fill="url(#hazard)"/></g>
-<g><rect class="cShell" x="1425" y="1080" width="210" height="190" rx="22"/><rect class="cFloor" x="1450" y="1110" width="160" height="130" rx="12"/></g>
-<g id="engine"><rect class="shell" x="1295" y="1210" width="470" height="490" rx="42"/><rect class="floor hot" x="1325" y="1240" width="410" height="430" rx="24"/><rect class="grid" x="1325" y="1240" width="410" height="430" rx="24"/><rect class="machine" x="1465" y="1360" width="130" height="160" rx="30"/><circle class="amber" cx="1530" cy="1440" r="25"/><rect class="panel" x="1475" y="1540" width="110" height="65" rx="12"/></g>
+<!-- Central spine with generous spacing and clean, full-width doorways. -->
+<g><rect class="corridorShell" x="1070" y="430" width="180" height="290" rx="20"/><rect class="corridorFloor" x="1090" y="450" width="140" height="250"/></g>
+<g id="maintenance-tunnel"><rect class="shell" x="970" y="670" width="560" height="710" rx="44"/><rect class="floor" x="1000" y="700" width="500" height="650" rx="26"/><rect class="grid" x="1000" y="700" width="500" height="650" rx="26"/><rect x="1040" y="750" width="420" height="16" fill="url(#hazard)"/><rect x="1040" y="1285" width="420" height="16" fill="url(#hazard)"/></g>
+<g><rect class="corridorShell" x="1130" y="1330" width="240" height="190" rx="20"/><rect class="corridorFloor" x="1150" y="1350" width="200" height="150"/></g>
+<g id="engine-room"><rect class="shell" x="970" y="1470" width="560" height="480" rx="44"/><rect class="floor hot" x="1000" y="1500" width="500" height="420" rx="26"/><rect class="grid" x="1000" y="1500" width="500" height="420" rx="26"/><rect class="machine" x="1180" y="1625" width="140" height="135" rx="30"/><circle class="amber" cx="1250" cy="1692" r="27"/><rect class="panel" x="1195" y="1810" width="110" height="65" rx="11"/></g>
 
-<!-- Access corridors and thruster chambers are pushed far apart for readable traversal. -->
-<g id="port-access"><rect class="cShell" x="490" y="1340" width="865" height="305" rx="34"/><rect class="cFloor" x="520" y="1370" width="805" height="245" rx="16"/><rect x="610" y="1410" width="590" height="18" fill="url(#hazard)"/></g>
-<g id="starboard-access"><rect class="cShell" x="1705" y="1340" width="865" height="305" rx="34"/><rect class="cFloor" x="1735" y="1370" width="805" height="245" rx="16"/><rect x="1840" y="1410" width="590" height="18" fill="url(#hazard)"/></g>
-<g><rect class="cShell" x="400" y="1395" width="140" height="195" rx="20"/><rect class="cFloor" x="430" y="1425" width="90" height="135" rx="10"/></g>
-<g><rect class="cShell" x="2520" y="1395" width="140" height="195" rx="20"/><rect class="cFloor" x="2540" y="1425" width="90" height="135" rx="10"/></g>
+<!-- Wide access corridors and isolated thruster chambers. -->
+<g id="port-engine-access"><rect class="corridorShell" x="400" y="1570" width="600" height="300" rx="34"/><rect class="corridorFloor" x="430" y="1600" width="570" height="240" rx="16"/><rect x="490" y="1640" width="400" height="18" fill="url(#hazard)"/></g>
+<g id="starboard-engine-access"><rect class="corridorShell" x="1500" y="1570" width="600" height="300" rx="34"/><rect class="corridorFloor" x="1500" y="1600" width="570" height="240" rx="16"/><rect x="1600" y="1640" width="400" height="18" fill="url(#hazard)"/></g>
+<g id="port-thruster-chamber"><rect class="shell" x="50" y="1420" width="410" height="710" rx="48"/><rect class="floor hot" x="80" y="1450" width="350" height="650" rx="28"/><rect class="grid" x="80" y="1450" width="350" height="650" rx="28"/><ellipse cx="240" cy="1980" rx="125" ry="72" fill="#050505" stroke="#aa6733" stroke-width="22"/><path d="M150 1995L120 2085H360L330 1995Z" fill="#ff8c26" opacity=".24" filter="url(#glow)"/><rect class="panel" x="330" y="1490" width="70" height="110" rx="11"/></g>
+<g id="starboard-thruster-chamber"><rect class="shell" x="2040" y="1420" width="410" height="710" rx="48"/><rect class="floor hot" x="2070" y="1450" width="350" height="650" rx="28"/><rect class="grid" x="2070" y="1450" width="350" height="650" rx="28"/><ellipse cx="2260" cy="1980" rx="125" ry="72" fill="#050505" stroke="#aa6733" stroke-width="22"/><path d="M2170 1995L2140 2085H2380L2350 1995Z" fill="#ff8c26" opacity=".24" filter="url(#glow)"/><rect class="panel" x="2100" y="1490" width="70" height="110" rx="11"/></g>
 
-<g id="port-thruster"><rect class="shell" x="65" y="1140" width="395" height="890" rx="46"/><rect class="floor hot" x="95" y="1170" width="335" height="830" rx="26"/><rect class="grid" x="95" y="1170" width="335" height="830" rx="26"/><rect class="machine" x="170" y="1515" width="165" height="250" rx="50"/><ellipse cx="252" cy="1825" rx="116" ry="68" fill="#050505" stroke="#a86430" stroke-width="22"/><path d="M165 1850L135 1980H370L340 1850Z" fill="#ff8c26" opacity=".25" filter="url(#glow)"/><rect class="panel" x="315" y="1235" width="75" height="115" rx="12"/></g>
-<g id="starboard-thruster"><rect class="shell" x="2600" y="1140" width="395" height="890" rx="46"/><rect class="floor hot" x="2630" y="1170" width="335" height="830" rx="26"/><rect class="grid" x="2630" y="1170" width="335" height="830" rx="26"/><rect class="machine" x="2725" y="1515" width="165" height="250" rx="50"/><ellipse cx="2807" cy="1825" rx="116" ry="68" fill="#050505" stroke="#a86430" stroke-width="22"/><path d="M2720 1850L2690 1980H2925L2895 1850Z" fill="#ff8c26" opacity=".25" filter="url(#glow)"/><rect class="panel" x="2665" y="1235" width="75" height="115" rx="12"/></g>
-
-<g opacity=".92"><circle class="red" cx="150" cy="150" r="10"/><circle class="red" cx="700" cy="150" r="10"/><circle class="amber" cx="910" cy="165" r="10"/><circle class="red" cx="1180" cy="350" r="10"/><circle class="red" cx="1395" cy="150" r="10"/><circle class="amber" cx="1910" cy="300" r="10"/><circle class="red" cx="2120" cy="145" r="10"/><circle class="blue" cx="2720" cy="390" r="10"/><circle class="red" cx="1345" cy="520" r="10"/><circle class="amber" cx="1705" cy="1080" r="10"/><circle class="red" cx="1345" cy="1260" r="10"/><circle class="red" cx="130" cy="1240" r="10"/><circle class="red" cx="2930" cy="1240" r="10"/></g>
+<g opacity=".9"><circle class="red" cx="175" cy="155" r="10"/><circle class="red" cx="730" cy="155" r="10"/><circle class="amber" cx="1010" cy="150" r="10"/><circle class="red" cx="1320" cy="420" r="10"/><circle class="red" cx="1570" cy="155" r="10"/><circle class="amber" cx="2140" cy="315" r="10"/><circle class="red" cx="2390" cy="145" r="10"/><circle class="blue" cx="2820" cy="390" r="10"/><circle class="red" cx="1030" cy="730" r="10"/><circle class="amber" cx="1480" cy="1320" r="10"/><circle class="red" cx="1030" cy="1530" r="10"/><circle class="red" cx="110" cy="1490" r="10"/><circle class="red" cx="2390" cy="1490" r="10"/></g>
 </svg>
