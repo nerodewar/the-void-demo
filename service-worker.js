@@ -1,6 +1,6 @@
 "use strict";
 
-const CACHE_VERSION = "the-void-demo-v1.2.7";
+const CACHE_VERSION = "the-void-demo-v1.2.8";
 const CORE_ASSETS = [
   "./",
   "./index.html",
