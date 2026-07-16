@@ -1,26 +1,26 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1800" viewBox="0 0 2400 1800">
   <defs>
     <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#202831"/>
-      <stop offset="0.5" stop-color="#11171d"/>
-      <stop offset="1" stop-color="#080c10"/>
+      <stop offset="0" stop-color="#3a4650"/>
+      <stop offset="0.5" stop-color="#222b33"/>
+      <stop offset="1" stop-color="#11171a"/>
     </linearGradient>
     <linearGradient id="cool" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#102937"/>
-      <stop offset="1" stop-color="#07131a"/>
+      <stop offset="0" stop-color="#1a3b4b"/>
+      <stop offset="1" stop-color="#0e222c"/>
     </linearGradient>
     <linearGradient id="engine" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#2b2118"/>
-      <stop offset="1" stop-color="#0b0b0a"/>
+      <stop offset="0" stop-color="#463629"/>
+      <stop offset="1" stop-color="#171614"/>
     </linearGradient>
     <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
-      <rect width="48" height="48" fill="none" stroke="#4d5c66" stroke-opacity=".14"/>
+      <rect width="48" height="48" fill="none" stroke="#b5c2ca" stroke-opacity=".22"/>
       <path d="M0 24H48M24 0V48" stroke="#9fb2bf" stroke-opacity=".035"/>
       <circle cx="6" cy="6" r="2" fill="#8fa0aa" opacity=".18"/>
     </pattern>
     <pattern id="grate" width="28" height="28" patternUnits="userSpaceOnUse">
-      <rect width="28" height="28" fill="#0b1014"/>
-      <path d="M0 0L28 28M28 0L0 28" stroke="#34424b" stroke-width="2" opacity=".45"/>
+      <rect width="28" height="28" fill="#151c21"/>
+      <path d="M0 0L28 28M28 0L0 28" stroke="#75848e" stroke-width="2" opacity=".55"/>
     </pattern>
     <pattern id="hazard" width="44" height="44" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
       <rect width="22" height="44" fill="#b06b1e" opacity=".7"/>
@@ -29,10 +29,10 @@
     <filter id="glow"><feGaussianBlur stdDeviation="8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
     <filter id="shadow"><feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="#000" flood-opacity=".88"/></filter>
     <style>
-      .room{stroke:#47535d;stroke-width:26;fill:url(#floor);filter:url(#shadow)}
+      .room{stroke:#aebbc4;stroke-width:22;fill:url(#floor);filter:url(#shadow)}
       .room.cool{fill:url(#cool)} .room.hot{fill:url(#engine)}
-      .inner{fill:url(#grid);stroke:#10161b;stroke-width:7}
-      .corridor{fill:url(#grate);stroke:#4b5861;stroke-width:20;filter:url(#shadow)}
+      .inner{fill:url(#grid);stroke:#d4dde2;stroke-opacity:.28;stroke-width:6}
+      .corridor{fill:url(#grate);stroke:#98a6af;stroke-width:18;filter:url(#shadow)}
 .small{font-size:24px;letter-spacing:3px;fill:#9eafb9}
       .pipe{fill:none;stroke:#202b32;stroke-width:20;stroke-linecap:round}
       .pipe2{fill:none;stroke:#53616b;stroke-width:5;opacity:.55}
@@ -40,7 +40,7 @@
       .console{fill:#071018;stroke:#52626e;stroke-width:7}.screen{fill:#0a84bd;stroke:#70d9ff;stroke-width:4;filter:url(#glow)}
     </style>
   </defs>
-  <rect width="2400" height="1800" fill="#010204"/>
+  <rect width="2400" height="1800" fill="#060a0e"/>
 
   <!-- upper deck -->
   <g id="control-corridor"><rect class="room" x="120" y="120" width="650" height="230" rx="38"/><rect class="inner" x="146" y="146" width="598" height="178" rx="22"/></g>
