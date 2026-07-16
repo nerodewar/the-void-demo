@@ -1,2 +1,2 @@
-The Void Demo v1.1.7
-Hunt 01 thruster chamber clearance and camera framing fix
+The Void Demo v1.1.8
+Hunt 01 startup rollback and thruster clearance hotfix

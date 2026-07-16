@@ -1,17 +1,5 @@
-THE VOID — HUNT 01 v1.1.7 THRUSTER FIX
+THE VOID — HUNT 01 v1.1.8 EMERGENCY HOTFIX
 
-Upload the contents of the included the-void-demo-main folder over the matching paths in your GitHub repository.
+Upload the contents of the-void-demo-main over the matching repository paths.
 
-Changed files:
-- hunt01/game.js
-- hunt01/assets/map/hunt01-map.svg
-- service-worker.js
-- VERSION.txt
-
-Fixes:
-- Removed the two large rectangular collision blockers from inside the port and starboard thruster chambers.
-- Removed their matching visual machinery rectangles from the SVG map.
-- Thruster chamber floors and kill zones are now fully traversable.
-- Camera frames the complete port or starboard chamber while Luna is inside it.
-- Added safe camera look-room near world edges so the starboard side no longer cuts off on wide iPad screens.
-- Offline cache bumped to v1.2.7.
+This hotfix removes the broken v1.1.7 chamber camera override, restores the proven v1.1.6 camera/startup code, and retains removal of the internal thruster collision blockers. Cache: v1.2.8.
