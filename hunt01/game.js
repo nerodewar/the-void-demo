@@ -9,7 +9,12 @@
   const TAU = Math.PI * 2;
 
   const canvas = $("#gameCanvas");
-  const ctx = canvas.getContext("2d", { alpha: false, desynchronized: true });
+  // Some iPad/Safari builds reject the performance-oriented context options.
+  // Fall back to a standard 2D context instead of leaving the game canvas black.
+  const ctx = canvas.getContext("2d", { alpha: false, desynchronized: true })
+    || canvas.getContext("2d", { alpha: false })
+    || canvas.getContext("2d");
+  if (!ctx) throw new Error("Hunt 01 could not create a 2D canvas context.");
   const huntShell = $("#huntShell");
   const hud = $("#hud");
   const objectivePanel = $("#objectivePanel");
@@ -152,6 +157,11 @@
     alien: "assets/sprites/alien.png",
     interactables: "assets/images/interactables-source.png"
   };
+
+  // Loaded artwork is stored here. This object is required by both the loader
+  // and every canvas drawing function; without it the first frame aborts after
+  // clearing the canvas, leaving only a black screen beneath the HUD.
+  const assets = Object.create(null);
 
   function loadImage(url) {
     return new Promise((resolve, reject) => {
@@ -1673,15 +1683,20 @@
     resize();
     startButton.disabled = true;
     startButton.textContent = "LOADING ENGINE DECK…";
-    try {
-      await Promise.all(Object.entries(imageSources).map(async ([key, url]) => { assets[key] = await loadImage(url); }));
-      startButton.disabled = false;
-      startButton.textContent = "ENTER HUNT MODE";
-    } catch (error) {
-      console.warn("[Hunt 01] Some artwork could not be loaded; using fallback rendering.", error);
-      startButton.disabled = false;
-      startButton.textContent = "ENTER HUNT MODE";
+    const imageResults = await Promise.allSettled(
+      Object.entries(imageSources).map(async ([key, url]) => {
+        assets[key] = await loadImage(url);
+        return key;
+      })
+    );
+    const failedImages = imageResults
+      .map((result, index) => result.status === "rejected" ? Object.keys(imageSources)[index] : null)
+      .filter(Boolean);
+    if (failedImages.length) {
+      console.warn(`[Hunt 01] Artwork unavailable: ${failedImages.join(", ")}. Fallback rendering will be used where needed.`);
     }
+    startButton.disabled = false;
+    startButton.textContent = "ENTER HUNT MODE";
     resetMission();
     if (new URLSearchParams(location.search).get("debug") === "1" || window.__HUNT01_TEST__) {
       window.__hunt01Debug = {
