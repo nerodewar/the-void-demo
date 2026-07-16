@@ -1,0 +1,112 @@
+{
+  "world": {
+    "width": 2400,
+    "height": 1800
+  },
+  "playerSpawn": {
+    "x": 390,
+    "y": 245
+  },
+  "alienSpawn": {
+    "x": 1450,
+    "y": 235
+  },
+  "rooms": [
+    {
+      "id": "control",
+      "label": "CONTROL CORRIDOR",
+      "x": 120,
+      "y": 120,
+      "w": 625,
+      "h": 220
+    },
+    {
+      "id": "junction",
+      "label": "EMERGENCY JUNCTION",
+      "x": 785,
+      "y": 120,
+      "w": 320,
+      "h": 280
+    },
+    {
+      "id": "maintenanceHall",
+      "label": "MAINTENANCE HALL",
+      "x": 1145,
+      "y": 120,
+      "w": 570,
+      "h": 220
+    },
+    {
+      "id": "powerRelay",
+      "label": "POWER RELAY ROOM",
+      "x": 1755,
+      "y": 105,
+      "w": 470,
+      "h": 315
+    },
+    {
+      "id": "coolant",
+      "label": "COOLANT ACCESS",
+      "x": 100,
+      "y": 440,
+      "w": 410,
+      "h": 295
+    },
+    {
+      "id": "storage",
+      "label": "STORAGE ROOM",
+      "x": 555,
+      "y": 440,
+      "w": 350,
+      "h": 295
+    },
+    {
+      "id": "tunnel",
+      "label": "MAINTENANCE TUNNEL",
+      "x": 875,
+      "y": 380,
+      "w": 370,
+      "h": 525
+    },
+    {
+      "id": "engine",
+      "label": "ENGINE ROOM",
+      "x": 875,
+      "y": 955,
+      "w": 370,
+      "h": 400
+    },
+    {
+      "id": "portAccess",
+      "label": "PORT ENGINE ACCESS",
+      "x": 370,
+      "y": 1035,
+      "w": 530,
+      "h": 270
+    },
+    {
+      "id": "starboardAccess",
+      "label": "STARBOARD ENGINE ACCESS",
+      "x": 1220,
+      "y": 1035,
+      "w": 530,
+      "h": 270
+    },
+    {
+      "id": "portThruster",
+      "label": "PORT THRUSTER CHAMBER",
+      "x": 65,
+      "y": 900,
+      "w": 355,
+      "h": 720
+    },
+    {
+      "id": "starboardThruster",
+      "label": "STARBOARD THRUSTER CHAMBER",
+      "x": 1700,
+      "y": 900,
+      "w": 355,
+      "h": 720
+    }
+  ]
+}

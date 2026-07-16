@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1800" viewBox="0 0 2400 1800">
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#080d12"/><stop offset="1" stop-color="#020507"/></linearGradient>
+  <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#35414a"/><stop offset=".55" stop-color="#202931"/><stop offset="1" stop-color="#11171c"/></linearGradient>
+  <linearGradient id="hot" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#40352d"/><stop offset="1" stop-color="#171615"/></linearGradient>
+  <linearGradient id="cool" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#173746"/><stop offset="1" stop-color="#0a202b"/></linearGradient>
+  <linearGradient id="silver" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#eef4f7"/><stop offset=".18" stop-color="#8c9aa3"/><stop offset=".5" stop-color="#d5dde1"/><stop offset=".78" stop-color="#65737d"/><stop offset="1" stop-color="#c4cdd2"/></linearGradient>
+  <pattern id="grid" width="44" height="44" patternUnits="userSpaceOnUse"><rect width="44" height="44" fill="none" stroke="#c6d2da" stroke-opacity=".16"/><circle cx="6" cy="6" r="2" fill="#d7e0e5" opacity=".16"/></pattern>
+  <pattern id="grate" width="26" height="26" patternUnits="userSpaceOnUse"><rect width="26" height="26" fill="#11181d"/><path d="M0 0L26 26M26 0L0 26" stroke="#6f7e88" stroke-width="2" opacity=".44"/></pattern>
+  <pattern id="hazard" width="36" height="36" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="18" height="36" fill="#c47a24"/><rect x="18" width="18" height="36" fill="#12171b"/></pattern>
+  <filter id="shadow"><feDropShadow dx="0" dy="12" stdDeviation="15" flood-color="#000" flood-opacity=".85"/></filter>
+  <filter id="glow"><feGaussianBlur stdDeviation="7" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <style>
+    .shell{fill:url(#silver);stroke:#303b43;stroke-width:8;filter:url(#shadow)}
+    .floor{fill:url(#floor);stroke:#202931;stroke-width:4}.floor.hot{fill:url(#hot)}.floor.cool{fill:url(#cool)}
+    .grid{fill:url(#grid)}.corridorShell{fill:url(#silver);stroke:#303b43;stroke-width:7;filter:url(#shadow)}.corridorFloor{fill:url(#grate)}
+    .machine{fill:#141b20;stroke:#71808a;stroke-width:8}.panel{fill:#071018;stroke:#64747e;stroke-width:6}.blue{fill:#2bbcff;filter:url(#glow)}.red{fill:#ff3f28;filter:url(#glow)}.amber{fill:#ffad38;filter:url(#glow)}
+  </style>
+</defs>
+<rect width="2400" height="1800" fill="url(#bg)"/>
+
+<!-- Every room has its own footprint. Connectors touch at doors but never sit beneath another room. -->
+<g id="control-corridor"><rect class="shell" x="120" y="120" width="625" height="220" rx="34"/><rect class="floor" x="145" y="145" width="575" height="170" rx="20"/><rect class="grid" x="145" y="145" width="575" height="170" rx="20"/></g>
+<g><rect class="corridorShell" x="710" y="175" width="110" height="110" rx="16"/><rect class="corridorFloor" x="720" y="190" width="90" height="80"/></g>
+<g id="emergency-junction"><path class="shell" d="M850 120H1040L1105 185V335L1040 400H850L785 335V185Z"/><path class="floor" d="M870 145H1020L1080 205V315L1020 375H870L810 315V205Z"/><path class="grid" d="M870 145H1020L1080 205V315L1020 375H870L810 315V205Z"/></g>
+<g><rect class="corridorShell" x="1070" y="175" width="110" height="110" rx="16"/><rect class="corridorFloor" x="1080" y="190" width="90" height="80"/></g>
+<g id="maintenance-hall"><rect class="shell" x="1145" y="120" width="570" height="220" rx="34"/><rect class="floor" x="1170" y="145" width="520" height="170" rx="20"/><rect class="grid" x="1170" y="145" width="520" height="170" rx="20"/></g>
+<g><rect class="corridorShell" x="1680" y="175" width="110" height="110" rx="16"/><rect class="corridorFloor" x="1690" y="190" width="90" height="80"/></g>
+<g id="power-relay-room"><rect class="shell" x="1755" y="105" width="470" height="315" rx="38"/><rect class="floor hot" x="1780" y="135" width="420" height="260" rx="22"/><rect class="grid" x="1780" y="135" width="420" height="260" rx="22"/><rect class="machine" x="1900" y="205" width="115" height="100" rx="18"/><circle class="blue" cx="2100" cy="265" r="13"/></g>
+
+<g><rect class="corridorShell" x="235" y="305" width="120" height="170" rx="16"/><rect class="corridorFloor" x="250" y="315" width="90" height="150"/></g>
+<g id="coolant-access"><rect class="shell" x="100" y="440" width="410" height="295" rx="38"/><rect class="floor cool" x="125" y="465" width="360" height="245" rx="22"/><rect class="grid" x="125" y="465" width="360" height="245" rx="22"/><path d="M175 500V680M250 490V690M435 490V690" fill="none" stroke="#526773" stroke-width="16"/><circle class="blue" cx="180" cy="680" r="12"/></g>
+<g><rect class="corridorShell" x="475" y="530" width="115" height="115" rx="16"/><rect class="corridorFloor" x="485" y="545" width="95" height="85"/></g>
+<g id="storage-room"><rect class="shell" x="555" y="440" width="350" height="295" rx="38"/><rect class="floor" x="580" y="465" width="300" height="245" rx="22"/><rect class="grid" x="580" y="465" width="300" height="245" rx="22"/><rect class="machine" x="635" y="525" width="105" height="85" rx="16"/><rect class="panel" x="775" y="550" width="80" height="100" rx="14"/><rect class="blue" x="792" y="570" width="46" height="45" rx="8"/></g>
+<g><rect class="corridorShell" x="790" y="365" width="120" height="110" rx="16"/><rect class="corridorFloor" x="805" y="375" width="95" height="90"/></g>
+
+<g id="maintenance-tunnel"><rect class="shell" x="875" y="380" width="370" height="525" rx="36"/><rect class="floor" x="900" y="405" width="320" height="475" rx="20"/><rect class="grid" x="900" y="405" width="320" height="475" rx="20"/><rect x="930" y="445" width="260" height="14" fill="url(#hazard)"/><rect x="930" y="825" width="260" height="14" fill="url(#hazard)"/></g>
+<g><rect class="corridorShell" x="975" y="870" width="170" height="120" rx="16"/><rect class="corridorFloor" x="990" y="880" width="140" height="100"/></g>
+<g id="engine-room"><rect class="shell" x="875" y="955" width="370" height="400" rx="36"/><rect class="floor hot" x="900" y="980" width="320" height="350" rx="20"/><rect class="grid" x="900" y="980" width="320" height="350" rx="20"/><rect class="machine" x="1000" y="1080" width="120" height="145" rx="28"/><circle class="amber" cx="1060" cy="1150" r="24"/><rect class="panel" x="1008" y="1240" width="104" height="55" rx="10"/></g>
+
+<g id="port-engine-access"><rect class="corridorShell" x="370" y="1035" width="530" height="270" rx="30"/><rect class="corridorFloor" x="395" y="1060" width="505" height="220" rx="14"/><rect x="445" y="1090" width="360" height="16" fill="url(#hazard)"/></g>
+<g id="starboard-engine-access"><rect class="corridorShell" x="1220" y="1035" width="530" height="270" rx="30"/><rect class="corridorFloor" x="1220" y="1060" width="505" height="220" rx="14"/><rect x="1300" y="1090" width="350" height="16" fill="url(#hazard)"/></g>
+
+<g id="port-thruster-chamber"><rect class="shell" x="65" y="900" width="355" height="720" rx="42"/><rect class="floor hot" x="95" y="930" width="300" height="650" rx="24"/><rect class="grid" x="95" y="930" width="300" height="650" rx="24"/><rect class="machine" x="155" y="1180" width="150" height="225" rx="45"/><ellipse cx="230" cy="1420" rx="105" ry="62" fill="#050505" stroke="#a86430" stroke-width="20"/><path d="M150 1440L125 1545H335L310 1440Z" fill="#ff8c26" opacity=".22" filter="url(#glow)"/><rect class="panel" x="300" y="985" width="65" height="100" rx="10"/></g>
+<g><rect class="corridorShell" x="315" y="1100" width="90" height="140" rx="16"/><rect class="corridorFloor" x="325" y="1115" width="70" height="110"/></g>
+<g id="starboard-thruster-chamber"><rect class="shell" x="1700" y="900" width="355" height="720" rx="42"/><rect class="floor hot" x="1725" y="930" width="300" height="650" rx="24"/><rect class="grid" x="1725" y="930" width="300" height="650" rx="24"/><rect class="machine" x="1815" y="1180" width="150" height="225" rx="45"/><ellipse cx="1890" cy="1420" rx="105" ry="62" fill="#050505" stroke="#a86430" stroke-width="20"/><path d="M1810 1440L1785 1545H1995L1970 1440Z" fill="#ff8c26" opacity=".22" filter="url(#glow)"/><rect class="panel" x="1755" y="985" width="65" height="100" rx="10"/></g>
+<g><rect class="corridorShell" x="1715" y="1100" width="90" height="140" rx="16"/><rect class="corridorFloor" x="1725" y="1115" width="70" height="110"/></g>
+
+<g opacity=".9"><circle class="red" cx="165" cy="150" r="9"/><circle class="red" cx="700" cy="150" r="9"/><circle class="amber" cx="825" cy="175" r="9"/><circle class="red" cx="1060" cy="350" r="9"/><circle class="red" cx="1200" cy="150" r="9"/><circle class="amber" cx="1660" cy="300" r="9"/><circle class="red" cx="925" cy="430" r="9"/><circle class="amber" cx="1190" cy="850" r="9"/><circle class="red" cx="920" cy="1010" r="9"/><circle class="red" cx="120" cy="970" r="9"/><circle class="red" cx="2000" cy="970" r="9"/></g>
+</svg>
