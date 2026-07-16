@@ -1,5 +1,11 @@
-THE VOID — HUNT 01 v1.1.8 EMERGENCY HOTFIX
+HUNT 01 — LUNA WALKING/GROUNDING FIX
 
-Upload the contents of the-void-demo-main over the matching repository paths.
+Replace these files in the repository:
+  hunt01/game.js
+  service-worker.js
 
-This hotfix removes the broken v1.1.7 chamber camera override, restores the proven v1.1.6 camera/startup code, and retains removal of the internal thruster collision blockers. Cache: v1.2.8.
+Changes:
+- Removes the malformed undersized left-walk frame from the animation sequence.
+- Advances walk animation using real distance travelled, preventing sliding at walls.
+- Uses a stable floor anchor and contact shadow so Luna remains planted on the deck.
+- Updates the offline cache version to the-void-demo-v1.2.11.
