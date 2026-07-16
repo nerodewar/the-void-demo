@@ -58,100 +58,92 @@
   const resultShots = $("#resultShots");
   const resultThruster = $("#resultThruster");
 
-  const WORLD = { width: 2900, height: 2150 };
+  const WORLD = { width: 3000, height: 2200 };
   const MISSION_SECONDS = 300;
   const MAX_AMMO = 12;
-  const PLAYER_RADIUS = 17;
-  const ALIEN_RADIUS = 25;
+  const PLAYER_RADIUS = 18;
+  const ALIEN_RADIUS = 26;
   const isCoarsePointer = matchMedia("(pointer: coarse)").matches || navigator.maxTouchPoints > 0;
   const returnUrl = new URLSearchParams(location.search).get("return") || "../index.html";
 
   for (let i = 0; i < MAX_AMMO; i += 1) ammoPips.append(document.createElement("i"));
 
   const walkRects = [
-    // A deliberately spread-out plan. Each connector overlaps the adjacent floor slightly,
-    // creating generous, snag-free thresholds while the visible wall shells remain separate.
-    { x: 120, y: 135, w: 600, h: 185, room: "CONTROL CORRIDOR" },
-    { x: 720, y: 190, w: 155, h: 85 },
-    { x: 875, y: 125, w: 330, h: 270, room: "EMERGENCY JUNCTION" },
-    { x: 1205, y: 190, w: 170, h: 85 },
-    { x: 1375, y: 135, w: 560, h: 185, room: "MAINTENANCE HALL" },
-    { x: 1935, y: 190, w: 165, h: 85 },
-    { x: 2100, y: 105, w: 650, h: 330, room: "POWER RELAY ROOM" },
+    // Upper route: large rooms separated by long, generous connectors.
+    { x: 140, y: 140, w: 620, h: 200, room: "CONTROL CORRIDOR" },
+    { x: 760, y: 195, w: 220, h: 90 },
+    { x: 980, y: 120, w: 360, h: 330, room: "EMERGENCY JUNCTION" },
+    { x: 1340, y: 195, w: 200, h: 90 },
+    { x: 1540, y: 140, w: 620, h: 200, room: "MAINTENANCE HALL" },
+    { x: 2160, y: 195, w: 200, h: 90 },
+    { x: 2360, y: 110, w: 480, h: 300, room: "POWER RELAY ROOM" },
 
-    // Support wing. Wide connectors prevent the storage/recharge route becoming a trap.
-    { x: 265, y: 320, w: 120, h: 230 },
-    { x: 105, y: 550, w: 500, h: 330, room: "COOLANT ACCESS" },
-    { x: 605, y: 655, w: 150, h: 100 },
-    { x: 755, y: 550, w: 440, h: 330, room: "STORAGE ROOM" },
-    { x: 965, y: 395, w: 150, h: 155 },
-    { x: 1450, y: 300, w: 160, h: 200 },
+    // Side rooms are physically separated from the central spine.
+    { x: 270, y: 340, w: 140, h: 260 },
+    { x: 120, y: 600, w: 430, h: 300, room: "COOLANT ACCESS" },
+    { x: 550, y: 735, w: 100, h: 120 },
+    { x: 650, y: 650, w: 400, h: 300, room: "STORAGE ROOM" },
+    { x: 1050, y: 735, w: 150, h: 120 },
 
-    // Central route. The tunnel, doorway and engine room are separated by obvious breathing space.
-    { x: 1325, y: 500, w: 410, h: 610, room: "MAINTENANCE TUNNEL" },
-    { x: 1450, y: 1110, w: 160, h: 130 },
-    { x: 1325, y: 1240, w: 410, h: 430, room: "ENGINE ROOM" },
+    // Broad central route. Junction, tunnel and engine room never overlap.
+    { x: 1090, y: 450, w: 140, h: 250 },
+    { x: 1000, y: 700, w: 500, h: 650, room: "MAINTENANCE TUNNEL" },
+    { x: 1150, y: 1350, w: 200, h: 150 },
+    { x: 1000, y: 1500, w: 500, h: 420, room: "ENGINE ROOM" },
 
-    // Broad access routes with room to circle, evade and re-path.
-    { x: 520, y: 1370, w: 805, h: 245, room: "PORT ENGINE ACCESS" },
-    { x: 1735, y: 1370, w: 805, h: 245, room: "STARBOARD ENGINE ACCESS" },
-    { x: 430, y: 1425, w: 90, h: 135 },
-    { x: 2540, y: 1425, w: 90, h: 135 },
-
-    // Large, distinct thruster chambers placed well away from the central spine.
-    { x: 95, y: 1170, w: 335, h: 830, room: "PORT THRUSTER CHAMBER" },
-    { x: 2630, y: 1170, w: 335, h: 830, room: "STARBOARD THRUSTER CHAMBER" }
+    // Wide engine approaches with full-height doorway openings.
+    { x: 430, y: 1600, w: 570, h: 240, room: "PORT ENGINE ACCESS" },
+    { x: 1500, y: 1600, w: 570, h: 240, room: "STARBOARD ENGINE ACCESS" },
+    { x: 80, y: 1450, w: 350, h: 650, room: "PORT THRUSTER CHAMBER" },
+    { x: 2070, y: 1450, w: 350, h: 650, room: "STARBOARD THRUSTER CHAMBER" }
   ];
 
   const blockedRects = [
-    { x: 1465, y: 1360, w: 130, h: 160 },
-    { x: 870, y: 660, w: 110, h: 95 },
-    { x: 2350, y: 205, w: 125, h: 115 },
-    { x: 170, y: 1515, w: 165, h: 250 },
-    { x: 2725, y: 1515, w: 165, h: 250 }
+    { x: 1180, y: 1625, w: 140, h: 135 },
+    { x: 720, y: 740, w: 110, h: 100 },
+    { x: 2500, y: 205, w: 125, h: 105 }
   ];
 
   const doors = {
-    engine: { x: 1450, y: 1170, w: 160, h: 70, open: false, label: "ENGINE DECK BULKHEAD" },
-    port: { x: 1270, y: 1405, w: 55, h: 175, open: false, label: "PORT ACCESS BULKHEAD" },
-    starboard: { x: 1735, y: 1405, w: 55, h: 175, open: false, label: "STARBOARD ACCESS BULKHEAD" }
+    engine: { x: 1150, y: 1450, w: 200, h: 60, open: false, label: "ENGINE DECK BULKHEAD" },
+    port: { x: 970, y: 1640, w: 60, h: 160, open: false, label: "PORT ACCESS BULKHEAD" },
+    starboard: { x: 1470, y: 1640, w: 60, h: 160, open: false, label: "STARBOARD ACCESS BULKHEAD" }
   };
 
+  const doorFunnels = [
+    { x: 720, y: 155, w: 300, h: 170, axis: "x", center: 240 },
+    { x: 1300, y: 155, w: 280, h: 170, axis: "x", center: 240 },
+    { x: 2120, y: 155, w: 280, h: 170, axis: "x", center: 240 },
+    { x: 1040, y: 410, w: 240, h: 330, axis: "y", center: 1160 },
+    { x: 1080, y: 1300, w: 340, h: 250, axis: "y", center: 1250 },
+    { x: 900, y: 1540, w: 180, h: 360, axis: "x", center: 1720 },
+    { x: 1420, y: 1540, w: 180, h: 360, axis: "x", center: 1720 },
+    { x: 360, y: 1540, w: 150, h: 360, axis: "x", center: 1720 },
+    { x: 1990, y: 1540, w: 150, h: 360, axis: "x", center: 1720 },
+    { x: 500, y: 680, w: 200, h: 230, axis: "x", center: 795 },
+    { x: 1000, y: 680, w: 240, h: 230, axis: "x", center: 795 }
+  ];
+
   const objects = {
-    relay: { id: "relay", x: 2590, y: 270, radius: 84, duration: 1.8, label: "RESTORE ENGINE-DECK POWER", sprite: [1, 5] },
-    recharge: { id: "recharge", x: 1095, y: 720, radius: 90, duration: 2.65, label: "RECHARGE PLASMA CELLS", sprite: [0, 4] },
-    engine: { id: "engine", x: 1530, y: 1570, radius: 84, duration: 2.0, label: "PRIME MANUAL THRUSTER IGNITION", sprite: [1, 2] },
-    portSwitch: { id: "portSwitch", x: 360, y: 1285, radius: 80, duration: 0.8, label: "IGNITE PORT THRUSTER", sprite: [3, 4] },
-    starboardSwitch: { id: "starboardSwitch", x: 2700, y: 1285, radius: 80, duration: 0.8, label: "IGNITE STARBOARD THRUSTER", sprite: [3, 4] }
+    relay: { id: "relay", x: 2730, y: 260, radius: 82, duration: 1.8, label: "RESTORE ENGINE-DECK POWER", sprite: [1, 5] },
+    recharge: { id: "recharge", x: 930, y: 820, radius: 88, duration: 2.65, label: "RECHARGE PLASMA CELLS", sprite: [0, 4] },
+    engine: { id: "engine", x: 1250, y: 1840, radius: 82, duration: 2.0, label: "PRIME MANUAL THRUSTER IGNITION", sprite: [1, 2] },
+    portSwitch: { id: "portSwitch", x: 365, y: 1540, radius: 80, duration: 0.8, label: "IGNITE PORT THRUSTER", sprite: [3, 4] },
+    starboardSwitch: { id: "starboardSwitch", x: 2135, y: 1540, radius: 80, duration: 0.8, label: "IGNITE STARBOARD THRUSTER", sprite: [3, 4] }
   };
 
   const killZones = {
-    port: { x: 125, y: 1770, w: 275, h: 185 },
-    starboard: { x: 2660, y: 1770, w: 275, h: 185 }
+    port: { x: 105, y: 1900, w: 300, h: 170 },
+    starboard: { x: 2095, y: 1900, w: 300, h: 170 }
   };
 
   const ambientLights = [
-    [150,150,"red"],[700,150,"red"],[910,165,"amber"],[1180,350,"red"],
-    [1395,150,"red"],[1910,300,"amber"],[2120,145,"red"],[2720,390,"blue"],
-    [1345,520,"red"],[1705,1080,"amber"],[1345,1260,"red"],[1710,1650,"amber"],
-    [130,1240,"red"],[2930,1240,"red"],[250,1950,"amber"],[2810,1950,"amber"]
+    [175, 155, "red"], [730, 155, "red"], [1010, 150, "amber"], [1320, 420, "red"],
+    [1570, 155, "red"], [2140, 315, "amber"], [2390, 145, "red"], [2820, 390, "blue"],
+    [1030, 730, "red"], [1480, 1320, "amber"], [1030, 1530, "red"], [1475, 1900, "amber"],
+    [110, 1490, "red"], [2390, 1490, "red"], [250, 2070, "amber"], [2250, 2070, "amber"]
   ];
 
-  const doorwayFunnels = [
-    { x: 797, y: 232, axis: "x", half: 105 },
-    { x: 1290, y: 232, axis: "x", half: 110 },
-    { x: 2018, y: 232, axis: "x", half: 105 },
-    { x: 325, y: 435, axis: "y", half: 140 },
-    { x: 680, y: 705, axis: "x", half: 105 },
-    { x: 1040, y: 472, axis: "y", half: 105 },
-    { x: 1530, y: 1175, axis: "y", half: 110 },
-    { x: 1298, y: 1492, axis: "x", half: 105 },
-    { x: 1762, y: 1492, axis: "x", half: 105 },
-    { x: 475, y: 1492, axis: "x", half: 95 },
-    { x: 2585, y: 1492, axis: "x", half: 95 }
-  ];
-
-  const assets = {};
   const imageSources = {
     map: "assets/map/hunt01-map.svg",
     walk: "assets/sprites/luna-walk.png",
@@ -247,7 +239,7 @@
   let cssHeight = innerHeight;
   let dpr = 1;
   let zoom = 1;
-  const camera = { x: 390, y: 245, shake: 0 };
+  const camera = { x: 390, y: 240, shake: 0 };
   const keys = new Set();
   const input = {
     moveX: 0, moveY: 0,
@@ -285,7 +277,7 @@
   let pathRefresh = 0;
 
   const player = {
-    x: 390, y: 230, vx: 0, vy: 0,
+    x: 390, y: 240, vx: 0, vy: 0,
     health: 3, ammo: MAX_AMMO, speed: 205,
     aimAngle: 0, direction: 3,
     fireCooldown: 0, emptyCooldown: 0,
@@ -294,7 +286,7 @@
   };
 
   const alien = {
-    x: 1680, y: 225, vx: 0, vy: 0,
+    x: 1840, y: 240, vx: 0, vy: 0,
     state: "stalking", awake: false,
     stun: 0, slow: 0, attackCooldown: 0,
     chargeCooldown: 4.2, chargeTime: 0,
@@ -343,40 +335,35 @@
     return samples.every(([ox, oy]) => isInsideWalkUnion(x + ox, y + oy) && !isInsideBlockedGeometry(x + ox, y + oy, 1) && !isDoorBlocking(x + ox, y + oy));
   }
 
-  function nearestDoorwayFunnel(x, y) {
-    let best = null;
-    let bestDistance = Infinity;
-    for (const funnel of doorwayFunnels) {
-      const d = Math.hypot(x - funnel.x, y - funnel.y);
-      if (d < funnel.half && d < bestDistance) { best = funnel; bestDistance = d; }
+  function applyDoorFunnel(entity, dx, dy) {
+    for (const funnel of doorFunnels) {
+      if (!pointInRect(entity.x, entity.y, funnel, -18)) continue;
+      if (funnel.axis === "x" && Math.abs(dx) > Math.abs(dy) * 0.55) {
+        const maxCorrection = Math.max(0.4, Math.abs(dx) * 0.48);
+        dy += clamp((funnel.center - entity.y) * 0.085, -maxCorrection, maxCorrection);
+      } else if (funnel.axis === "y" && Math.abs(dy) > Math.abs(dx) * 0.55) {
+        const maxCorrection = Math.max(0.4, Math.abs(dy) * 0.48);
+        dx += clamp((funnel.center - entity.x) * 0.085, -maxCorrection, maxCorrection);
+      }
     }
-    return best;
+    return [dx, dy];
   }
 
   function moveCircle(entity, dx, dy, radius) {
-    // Resolve one axis at a time so characters slide along walls instead of sticking to corners.
-    let movedX = false;
-    let movedY = false;
-    if (isWalkable(entity.x + dx, entity.y, radius)) { entity.x += dx; movedX = true; }
-    if (isWalkable(entity.x, entity.y + dy, radius)) { entity.y += dy; movedY = true; }
-
-    // At a doorway, gently centre the feet hitbox when one axis is blocked. This is deliberately
-    // tiny and only operates inside the threshold, so it never feels like a teleport.
-    if ((!movedX || !movedY) && (Math.abs(dx) + Math.abs(dy) > 0.01)) {
-      const funnel = nearestDoorwayFunnel(entity.x, entity.y);
-      if (funnel) {
-        const strength = Math.min(5, Math.hypot(dx, dy) * 0.8 + 1.2);
-        if (funnel.axis === "x") {
-          const nudge = clamp(funnel.y - entity.y, -strength, strength);
-          if (isWalkable(entity.x, entity.y + nudge, radius)) entity.y += nudge;
-        } else {
-          const nudge = clamp(funnel.x - entity.x, -strength, strength);
-          if (isWalkable(entity.x + nudge, entity.y, radius)) entity.x += nudge;
-        }
-      }
+    [dx, dy] = applyDoorFunnel(entity, dx, dy);
+    const steps = Math.max(1, Math.ceil(Math.max(Math.abs(dx), Math.abs(dy)) / 7));
+    const stepX = dx / steps;
+    const stepY = dy / steps;
+    let blockedX = false;
+    let blockedY = false;
+    for (let i = 0; i < steps; i += 1) {
+      if (isWalkable(entity.x + stepX, entity.y, radius)) entity.x += stepX;
+      else blockedX = true;
+      if (isWalkable(entity.x, entity.y + stepY, radius)) entity.y += stepY;
+      else blockedY = true;
     }
-    if (!movedX) entity.vx = 0;
-    if (!movedY) entity.vy = 0;
+    if (blockedX) entity.vx = 0;
+    if (blockedY) entity.vy = 0;
   }
 
   function screenToWorld(x, y) {
@@ -421,12 +408,12 @@
     pendingCinematic = 0;
     pathRefresh = 0;
     Object.assign(player, {
-      x: 390, y: 230, vx: 0, vy: 0, health: 3, ammo: MAX_AMMO,
+      x: 390, y: 240, vx: 0, vy: 0, health: 3, ammo: MAX_AMMO,
       aimAngle: 0, direction: 3, fireCooldown: 0, emptyCooldown: 0,
       invulnerable: 0, damageAnim: 0, rechargeCooldown: 0
     });
     Object.assign(alien, {
-      x: 1680, y: 225, vx: 0, vy: 0, state: "stalking", awake: false,
+      x: 1840, y: 240, vx: 0, vy: 0, state: "stalking", awake: false,
       stun: 0, slow: 0, recover: 0, attackCooldown: 0, chargeCooldown: 5.8,
       chargeTime: 0, chargeX: 0, chargeY: 0, path: [], pathIndex: 0,
       killZoneTime: 0, alignedSide: null
@@ -1222,12 +1209,27 @@
     }
 
     const cameraEase = 1 - Math.pow(0.0008, dt);
-    camera.x = lerp(camera.x, player.x + input.aimX * 70, cameraEase);
-    camera.y = lerp(camera.y, player.y + input.aimY * 45, cameraEase);
+    let cameraTargetX = player.x + input.aimX * 70;
+    let cameraTargetY = player.y + input.aimY * 45;
+
+    // Edge chambers need room around them on wide iPad screens. While Luna is inside
+    // either thruster chamber, frame the complete chamber instead of pinning the
+    // camera to her position at the outer wall.
+    if (pointInRect(player.x, player.y, { x: 50, y: 1420, w: 410, h: 710 }, -40)) {
+      cameraTargetX = 255;
+      cameraTargetY = 1775;
+    } else if (pointInRect(player.x, player.y, { x: 2040, y: 1420, w: 410, h: 710 }, -40)) {
+      cameraTargetX = 2245;
+      cameraTargetY = 1775;
+    }
+
+    camera.x = lerp(camera.x, cameraTargetX, cameraEase);
+    camera.y = lerp(camera.y, cameraTargetY, cameraEase);
     const viewHalfW = cssWidth / (2 * zoom);
     const viewHalfH = cssHeight / (2 * zoom);
-    camera.x = clamp(camera.x, viewHalfW, WORLD.width - viewHalfW);
-    camera.y = clamp(camera.y, viewHalfH, WORLD.height - viewHalfH);
+    const edgeLookRoom = 180;
+    camera.x = clamp(camera.x, viewHalfW - edgeLookRoom, WORLD.width - viewHalfW + edgeLookRoom);
+    camera.y = clamp(camera.y, viewHalfH - edgeLookRoom, WORLD.height - viewHalfH + edgeLookRoom);
     camera.shake = Math.max(0, camera.shake - dt * 42);
   }
 
@@ -1469,7 +1471,7 @@
       ctx.fillRect(x - 90, y - 90, 180, 180);
     }
     if (Math.random() < .08) {
-      const sources = [[2100, 260], [1110, 1180], [1210, 630], [350, 580]];
+      const sources = [[2580, 260], [1250, 1680], [1120, 820], [300, 760]];
       const [x, y] = sources[Math.floor(Math.random() * sources.length)];
       addBurst(x, y, "spark", 2);
     }
