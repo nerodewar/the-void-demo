@@ -1,2 +1,2 @@
-The Void Demo v1.1.6
-Hunt 01 spread-out map and doorway navigation patch
+The Void Demo v1.1.7
+Hunt 01 thruster chamber clearance and camera framing fix
