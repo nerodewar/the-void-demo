@@ -68,6 +68,18 @@
   const MAX_AMMO = 12;
   const PLAYER_RADIUS = 18;
   const ALIEN_RADIUS = 26;
+  const LUNA_RENDER_WIDTH = 78;
+  const LUNA_RENDER_HEIGHT = 98;
+  const LUNA_FLOOR_OFFSET = 20;
+  const WALK_FRAME_DISTANCE = 24;
+  // The second left-facing source frame is much smaller than the rest of the
+  // sheet. Omitting it prevents Luna from visibly shrinking mid-stride.
+  const WALK_FRAME_SEQUENCES = [
+    [0, 1, 2, 3],
+    [0, 2, 3, 2],
+    [0, 1, 2, 3],
+    [0, 1, 2, 3]
+  ];
   const isCoarsePointer = matchMedia("(pointer: coarse)").matches || navigator.maxTouchPoints > 0;
   const returnUrl = new URLSearchParams(location.search).get("return") || "../index.html";
 
@@ -292,7 +304,8 @@
     aimAngle: 0, direction: 3,
     fireCooldown: 0, emptyCooldown: 0,
     invulnerable: 0, damageAnim: 0,
-    rechargeCooldown: 0
+    rechargeCooldown: 0,
+    walkCycle: 0, isMoving: false
   };
 
   const alien = {
@@ -420,7 +433,8 @@
     Object.assign(player, {
       x: 390, y: 240, vx: 0, vy: 0, health: 3, ammo: MAX_AMMO,
       aimAngle: 0, direction: 3, fireCooldown: 0, emptyCooldown: 0,
-      invulnerable: 0, damageAnim: 0, rechargeCooldown: 0
+      invulnerable: 0, damageAnim: 0, rechargeCooldown: 0,
+      walkCycle: 0, isMoving: false
     });
     Object.assign(alien, {
       x: 1840, y: 240, vx: 0, vy: 0, state: "stalking", awake: false,
@@ -1123,7 +1137,13 @@
     const speed = player.speed * (interaction ? 0 : 1);
     player.vx = moveX * speed;
     player.vy = moveY * speed;
+    const previousX = player.x;
+    const previousY = player.y;
     moveCircle(player, player.vx * dt, player.vy * dt, PLAYER_RADIUS);
+    const travelled = Math.hypot(player.x - previousX, player.y - previousY);
+    player.isMoving = travelled > 0.025;
+    if (player.isMoving) player.walkCycle = (player.walkCycle + travelled / WALK_FRAME_DISTANCE) % 4;
+    else if (moveLength <= 0.08) player.walkCycle = 0;
 
     const activelyAiming = (!isCoarsePointer && input.mouseActive) || input.aimPointer !== null || input.aimMagnitude > 0.14;
     if (moveLength > 0.08 && !activelyAiming) {
@@ -1131,7 +1151,7 @@
       else player.direction = moveY < 0 ? 2 : 0;
     }
 
-    if (moveLength > 0.08) {
+    if (player.isMoving) {
       footstepCooldown -= dt;
       if (footstepCooldown <= 0) {
         audio.play("footstep", 0.12, 0.92 + Math.random() * .16);
@@ -1341,10 +1361,9 @@
     let image = assets.aim;
     let cellW = 180;
     let cellH = 180;
-    let frames = 3;
     let row = player.direction;
-    let frame = Math.floor(animationClock * 5) % frames;
-    const moving = Math.hypot(player.vx, player.vy) > 8;
+    let frame = Math.floor(animationClock * 5) % 3;
+    const moving = player.isMoving;
     if (player.damageAnim > 0) {
       image = assets.damage;
       frame = Math.min(2, Math.floor((0.7 - player.damageAnim) * 7));
@@ -1352,16 +1371,34 @@
       image = assets.walk;
       cellW = 144;
       cellH = 180;
-      frames = 4;
-      frame = Math.floor(animationClock * 8) % frames;
+      const sequence = WALK_FRAME_SEQUENCES[row] || WALK_FRAME_SEQUENCES[0];
+      frame = sequence[Math.floor(player.walkCycle) % sequence.length];
     }
     if (!image) return;
-    const width = 78;
-    const height = 98;
+
+    const width = LUNA_RENDER_WIDTH;
+    const height = LUNA_RENDER_HEIGHT;
+    const floorY = player.y + LUNA_FLOOR_OFFSET;
+    const spriteY = floorY - height;
+
+    // A fixed floor contact shadow gives the sprite a stable visual anchor.
+    // It does not bob or scale with the animation frames.
+    ctx.save();
+    ctx.fillStyle = "rgba(0,0,0,.34)";
+    ctx.beginPath();
+    ctx.ellipse(player.x, floorY - 1, width * .28, height * .075, 0, 0, TAU);
+    ctx.fill();
+    ctx.restore();
+
     ctx.save();
     if (player.invulnerable > 0 && Math.floor(player.invulnerable * 12) % 2 === 0) ctx.globalAlpha = .35;
-    ctx.drawImage(image, frame * cellW, row * cellH, cellW, cellH, player.x - width / 2, player.y - height * .76, width, height);
+    ctx.drawImage(
+      image,
+      frame * cellW, row * cellH, cellW, cellH,
+      player.x - width / 2, spriteY, width, height
+    );
     ctx.restore();
+
     ctx.save();
     ctx.strokeStyle = "rgba(70,210,255,.34)";
     ctx.lineWidth = 2;
