@@ -40,7 +40,6 @@
   const aimKnob = $("#aimKnob");
   const interactButton = $("#interactButton");
   const scannerButton = $("#scannerButton");
-  const fireButton = $("#fireButton");
   const introScreen = $("#introScreen");
   const pauseScreen = $("#pauseScreen");
   const failScreen = $("#failScreen");
@@ -226,8 +225,9 @@
     aimX: 1, aimY: 0,
     mouseX: innerWidth * 0.65, mouseY: innerHeight * 0.5,
     mouseActive: false, fireHeld: false,
-    movePointer: null, aimPointer: null, firePointer: null,
-    moveOrigin: null, aimOrigin: null
+    movePointer: null, aimPointer: null,
+    moveOrigin: null, aimOrigin: null,
+    aimMagnitude: 0, aimFireSince: 0
   };
 
   let mode = "intro";
@@ -365,7 +365,7 @@
     });
     Object.assign(alien, {
       x: 1510, y: 235, vx: 0, vy: 0, state: "stalking", awake: false,
-      stun: 0, slow: 0, attackCooldown: 0, chargeCooldown: 4.2,
+      stun: 0, slow: 0, recover: 0, attackCooldown: 0, chargeCooldown: 5.8,
       chargeTime: 0, chargeX: 0, chargeY: 0, path: [], pathIndex: 0,
       killZoneTime: 0, alignedSide: null
     });
@@ -530,12 +530,10 @@
     input.fireHeld = false;
     input.movePointer = null;
     input.aimPointer = null;
-    input.firePointer = null;
     input.moveOrigin = null;
     input.aimOrigin = null;
     moveKnob.style.transform = "translate(0px, 0px)";
     aimKnob.style.transform = "translate(0px, 0px)";
-    fireButton.classList.remove("is-firing");
     keys.clear();
   }
 
@@ -746,8 +744,9 @@
         continue;
       }
       if (alien.awake && Math.hypot(shot.x - alien.x, shot.y - alien.y) < ALIEN_RADIUS + shot.radius) {
-        alien.stun = Math.max(alien.stun, 0.62);
-        alien.slow = Math.max(alien.slow, 2.25);
+        alien.stun = Math.max(alien.stun, 1.65);
+        alien.slow = Math.max(alien.slow, 3.4);
+        alien.recover = Math.max(alien.recover, 0.45);
         alien.chargeTime = 0;
         alien.state = "stunned";
         const length = Math.hypot(shot.vx, shot.vy) || 1;
@@ -917,7 +916,8 @@
     const len = Math.hypot(dx, dy) || 1;
     moveCircle(player, (dx / len) * 68, (dy / len) * 68, PLAYER_RADIUS);
     moveCircle(alien, (-dx / len) * 40, (-dy / len) * 40, ALIEN_RADIUS);
-    alien.attackCooldown = 1.1;
+    alien.attackCooldown = 1.85;
+    alien.recover = Math.max(alien.recover, 1.05);
     if (player.health <= 0) failMission("damage");
   }
 
@@ -933,6 +933,7 @@
     alien.slow = Math.max(0, alien.slow - dt);
     alien.attackCooldown = Math.max(0, alien.attackCooldown - dt);
     alien.chargeCooldown = Math.max(0, alien.chargeCooldown - dt);
+    alien.recover = Math.max(0, alien.recover - dt);
     alienVocalCooldown -= dt;
     if (alienVocalCooldown <= 0) {
       audio.play("alien-stalk", 0.22 + Math.min(0.24, 180 / Math.max(180, distance(player, alien))));
@@ -945,6 +946,12 @@
       alien.vy *= Math.pow(0.03, dt);
       return;
     }
+    if (alien.recover > 0) {
+      alien.state = "stalking";
+      alien.vx *= Math.pow(0.12, dt);
+      alien.vy *= Math.pow(0.12, dt);
+      return;
+    }
 
     const dxToPlayer = player.x - alien.x;
     const dyToPlayer = player.y - alien.y;
@@ -953,8 +960,8 @@
     if (alien.chargeTime > 0) {
       alien.state = "charging";
       alien.chargeTime -= dt;
-      alien.vx = alien.chargeX * 330;
-      alien.vy = alien.chargeY * 330;
+      alien.vx = alien.chargeX * 275;
+      alien.vy = alien.chargeY * 275;
       moveCircle(alien, alien.vx * dt, alien.vy * dt, ALIEN_RADIUS);
       if (Math.random() < dt * 20) particles.push({ x: alien.x, y: alien.y + 20, vx: -alien.vx * .05, vy: -alien.vy * .05, life: 1.1, maxLife: 1.1, size: 9 + Math.random() * 8, type: "slime" });
       if (Math.hypot(player.x - alien.x, player.y - alien.y) < 58) {
@@ -962,14 +969,16 @@
         audio.play("alien-attack", 0.65);
         damagePlayer();
         alien.chargeTime = 0;
+      } else if (alien.chargeTime <= 0) {
+        alien.recover = 0.95;
       }
       return;
     }
 
-    const canCharge = (phase > 0 || elapsed > 14) && alien.chargeCooldown <= 0 && distToPlayer > 135 && distToPlayer < 570 && lineWalkable(alien.x, alien.y, player.x, player.y, 18);
+    const canCharge = (phase > 0 || elapsed > 24) && alien.chargeCooldown <= 0 && distToPlayer > 165 && distToPlayer < 510 && lineWalkable(alien.x, alien.y, player.x, player.y, 18);
     if (canCharge) {
-      alien.chargeTime = 0.82;
-      alien.chargeCooldown = 4.1 + Math.random() * 2.8;
+      alien.chargeTime = 0.72;
+      alien.chargeCooldown = 6.4 + Math.random() * 3.2;
       alien.chargeX = dxToPlayer / distToPlayer;
       alien.chargeY = dyToPlayer / distToPlayer;
       alien.state = "charging";
@@ -982,7 +991,8 @@
 
     if (distToPlayer < 58 && alien.attackCooldown <= 0) {
       alien.state = "attacking";
-      alien.attackCooldown = 0.95;
+      alien.attackCooldown = 1.65;
+      alien.recover = 0.72;
       audio.play("alien-attack", 0.65);
       damagePlayer();
       return;
@@ -1010,8 +1020,9 @@
       ty = target.y - alien.y;
       tlen = Math.hypot(tx, ty) || 1;
     }
-    let speed = phase === 0 ? 96 : phase === 1 ? 122 : 146;
-    if (alien.slow > 0) speed *= 0.43;
+    let speed = phase === 0 ? 74 : phase === 1 ? 96 : 118;
+    if (!lineWalkable(alien.x, alien.y, player.x, player.y, 18)) speed *= 0.78;
+    if (alien.slow > 0) speed *= 0.34;
     if (phase === 2 && alien.alignedSide && alien.killZoneTime < 2.45) speed *= 0.16;
     alien.vx = (tx / tlen) * speed;
     alien.vy = (ty / tlen) * speed;
@@ -1035,10 +1046,6 @@
     if (!isCoarsePointer) {
       moveX = (keys.has("KeyD") || keys.has("ArrowRight") ? 1 : 0) - (keys.has("KeyA") || keys.has("ArrowLeft") ? 1 : 0);
       moveY = (keys.has("KeyS") || keys.has("ArrowDown") ? 1 : 0) - (keys.has("KeyW") || keys.has("ArrowUp") ? 1 : 0);
-    }
-    if (input.fireHeld) {
-      moveX = 0;
-      moveY = 0;
     }
     const moveLength = Math.hypot(moveX, moveY);
     if (moveLength > 1) { moveX /= moveLength; moveY /= moveLength; }
@@ -1197,6 +1204,28 @@
     ctx.arc(object.x, object.y, object.radius * .58, 0, TAU);
     ctx.stroke();
     ctx.restore();
+
+    const nearby = distance(player, object) < 250;
+    if (active && nearby) {
+      const currentObjective = (object.id === "relay" && phase === 0) || (object.id === "engine" && phase === 1) || (object.id.includes("Switch") && phase === 2);
+      const label = object.id === "recharge" ? "PLASMA RECHARGE" : object.id === "relay" ? "POWER RELAY" : object.id === "engine" ? "THRUSTER CONTROL" : object.id === "portSwitch" ? "PORT IGNITION" : "STARBOARD IGNITION";
+      const accent = currentObjective ? "255,174,57" : "87,207,255";
+      ctx.save();
+      ctx.font = "700 15px system-ui";
+      ctx.textAlign = "center";
+      const width = ctx.measureText(label).width + 30;
+      const y = object.y - size * .72 - 18;
+      ctx.fillStyle = "rgba(3,10,14,.82)";
+      ctx.strokeStyle = `rgba(${accent},.72)`;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(object.x - width / 2, y - 20, width, 30, 8);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = currentObjective ? "#ffe4b8" : "#c9f2ff";
+      ctx.fillText(label, object.x, y);
+      ctx.restore();
+    }
   }
 
   function drawKillZone(zone, side) {
@@ -1370,11 +1399,11 @@
     const playerScreen = worldToScreen(player.x, player.y);
     ctx.save();
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const radius = Math.min(cssWidth, cssHeight) * .42;
+    const radius = Math.min(cssWidth, cssHeight) * .50;
     const gradient = ctx.createRadialGradient(playerScreen.x, playerScreen.y, radius * .16, playerScreen.x, playerScreen.y, radius);
     gradient.addColorStop(0, "rgba(0,0,0,.02)");
-    gradient.addColorStop(.45, "rgba(0,0,0,.16)");
-    gradient.addColorStop(1, "rgba(0,0,0,.77)");
+    gradient.addColorStop(.45, "rgba(0,0,0,.09)");
+    gradient.addColorStop(1, "rgba(0,0,0,.56)");
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, cssWidth, cssHeight);
 
@@ -1464,9 +1493,18 @@
       input.moveY = ny;
     } else {
       const mag = Math.hypot(nx, ny);
+      input.aimMagnitude = mag;
       if (mag > .14) {
         input.aimX = nx / mag;
         input.aimY = ny / mag;
+      }
+      const now = performance.now();
+      if (mag >= .82) {
+        if (!input.aimFireSince) input.aimFireSince = now;
+        input.fireHeld = now - input.aimFireSince >= 160;
+      } else if (mag <= .72) {
+        input.aimFireSince = 0;
+        input.fireHeld = false;
       }
     }
   }
@@ -1494,6 +1532,7 @@
       input[kind === "move" ? "moveOrigin" : "aimOrigin"] = null;
       knob.style.transform = "translate(0px, 0px)";
       if (kind === "move") { input.moveX = 0; input.moveY = 0; }
+      else { input.aimMagnitude = 0; input.aimFireSince = 0; input.fireHeld = false; }
       try { zone.releasePointerCapture?.(event.pointerId); } catch {}
     };
     zone.addEventListener("pointerup", release);
@@ -1545,26 +1584,6 @@
 
   bindStick(moveZone, moveKnob, "move");
   bindStick(aimZone, aimKnob, "aim");
-
-  fireButton.addEventListener("pointerdown", (event) => {
-    event.preventDefault();
-    if (mode !== "playing" || input.firePointer !== null) return;
-    input.firePointer = event.pointerId;
-    input.fireHeld = true;
-    fireButton.classList.add("is-firing");
-    try { fireButton.setPointerCapture?.(event.pointerId); } catch {}
-    tryFire();
-  });
-  const releaseFireButton = (event) => {
-    if (input.firePointer !== event.pointerId) return;
-    input.firePointer = null;
-    input.fireHeld = false;
-    fireButton.classList.remove("is-firing");
-    try { fireButton.releasePointerCapture?.(event.pointerId); } catch {}
-  };
-  fireButton.addEventListener("pointerup", releaseFireButton);
-  fireButton.addEventListener("pointercancel", releaseFireButton);
-  fireButton.addEventListener("lostpointercapture", releaseFireButton);
 
   interactButton.addEventListener("pointerdown", (event) => { event.preventDefault(); tryInteract(); });
   scannerButton.addEventListener("pointerdown", (event) => { event.preventDefault(); pulseScanner(); });
