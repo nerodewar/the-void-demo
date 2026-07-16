@@ -1,2 +1,2 @@
-The Void Demo v1.1.5
-Hunt 01 clean floorplan and collision-wall update
+The Void Demo v1.1.6
+Hunt 01 spread-out map and doorway navigation patch
