@@ -79,27 +79,27 @@
     { x: 275, y: 330, w: 110, h: 140 },
     { x: 100, y: 450, w: 500, h: 300, room: "COOLANT ACCESS" },
     { x: 580, y: 540, w: 95, h: 115 },
-    { x: 650, y: 440, w: 420, h: 300, room: "STORAGE ROOM" },
+    { x: 620, y: 420, w: 520, h: 340, room: "STORAGE ROOM" },
     { x: 720, y: 330, w: 125, h: 130 },
-    { x: 930, y: 380, w: 110, h: 90 },
-    { x: 970, y: 410, w: 300, h: 500, room: "MAINTENANCE TUNNEL" },
-    { x: 1020, y: 875, w: 200, h: 110 },
-    { x: 970, y: 900, w: 300, h: 70 },
-    { x: 970, y: 940, w: 300, h: 420, room: "ENGINE ROOM" },
-    { x: 585, y: 1095, w: 400, h: 210, room: "PORT ENGINE ACCESS" },
-    { x: 1255, y: 1095, w: 400, h: 210, room: "STARBOARD ENGINE ACCESS" },
-    { x: 930, y: 1110, w: 90, h: 190 },
-    { x: 1220, y: 1110, w: 90, h: 190 },
-    { x: 550, y: 1110, w: 100, h: 190 },
-    { x: 1590, y: 1110, w: 100, h: 190 },
-    { x: 145, y: 965, w: 470, h: 680, room: "PORT THRUSTER CHAMBER" },
-    { x: 1625, y: 965, w: 470, h: 680, room: "STARBOARD THRUSTER CHAMBER" }
+    { x: 820, y: 360, w: 220, h: 120 },
+    { x: 850, y: 390, w: 540, h: 540, room: "MAINTENANCE TUNNEL" },
+    { x: 970, y: 880, w: 300, h: 120 },
+    { x: 850, y: 890, w: 540, h: 110 },
+    { x: 850, y: 920, w: 540, h: 480, room: "ENGINE ROOM" },
+    { x: 420, y: 1060, w: 450, h: 300, room: "PORT ENGINE ACCESS" },
+    { x: 1370, y: 1060, w: 450, h: 300, room: "STARBOARD ENGINE ACCESS" },
+    { x: 820, y: 1080, w: 100, h: 250 },
+    { x: 1320, y: 1080, w: 100, h: 250 },
+    { x: 570, y: 1080, w: 110, h: 250 },
+    { x: 1560, y: 1080, w: 110, h: 250 },
+    { x: 70, y: 920, w: 610, h: 760, room: "PORT THRUSTER CHAMBER" },
+    { x: 1560, y: 920, w: 610, h: 760, room: "STARBOARD THRUSTER CHAMBER" }
   ];
 
   const doors = {
-    engine: { x: 985, y: 900, w: 270, h: 44, open: false, label: "ENGINE DECK BULKHEAD" },
-    port: { x: 930, y: 1120, w: 55, h: 165, open: false, label: "PORT ACCESS BULKHEAD" },
-    starboard: { x: 1255, y: 1120, w: 55, h: 165, open: false, label: "STARBOARD ACCESS BULKHEAD" }
+    engine: { x: 875, y: 900, w: 490, h: 44, open: false, label: "ENGINE DECK BULKHEAD" },
+    port: { x: 835, y: 1090, w: 55, h: 225, open: false, label: "PORT ACCESS BULKHEAD" },
+    starboard: { x: 1350, y: 1090, w: 55, h: 225, open: false, label: "STARBOARD ACCESS BULKHEAD" }
   };
 
   const objects = {
@@ -592,7 +592,15 @@
       audio.play("plasma-empty", 0.35, 0.7);
       return;
     }
-    interaction = { object, elapsed: 0, startX: player.x, startY: player.y, loopSound: null };
+    input.moveX = 0;
+    input.moveY = 0;
+    moveKnob.style.transform = "translate(0px, 0px)";
+    interaction = { object, elapsed: 0, startX: player.x, startY: player.y, loopSound: null, grace: 0.35 };
+    interactionPrompt.hidden = false;
+    interactionLabel.textContent = object.label;
+    interactionProgress.style.width = "1%";
+    flashMessage(`${object.label} // HOLDING POSITION`, 0.9);
+    audio.play("terminal-activate", 0.25, 1.15);
     if (object.id === "recharge") interaction.loopSound = audio.play("plasma-recharge-loop", 0.42);
   }
 
@@ -640,7 +648,8 @@
     if (!interaction) return;
     const object = interaction.object;
     const d = Math.hypot(player.x - object.x, player.y - object.y);
-    if (d > object.radius + 10 || moveMagnitude > 0.24) {
+    interaction.grace = Math.max(0, (interaction.grace || 0) - dt);
+    if (d > object.radius + 18 || (interaction.grace <= 0 && moveMagnitude > 0.68)) {
       cancelInteraction("INTERACTION INTERRUPTED");
       return;
     }
@@ -680,8 +689,11 @@
       input.aimY = dy / length;
     }
     player.aimAngle = Math.atan2(input.aimY, input.aimX);
-    if (Math.abs(input.aimX) > Math.abs(input.aimY)) player.direction = input.aimX < 0 ? 1 : 3;
-    else player.direction = input.aimY < 0 ? 2 : 0;
+    const activelyAiming = (!isCoarsePointer && input.mouseActive) || input.aimPointer !== null || input.aimMagnitude > 0.14;
+    if (activelyAiming) {
+      if (Math.abs(input.aimX) > Math.abs(input.aimY)) player.direction = input.aimX < 0 ? 1 : 3;
+      else player.direction = input.aimY < 0 ? 2 : 0;
+    }
   }
 
   function tryFire() {
@@ -1053,6 +1065,12 @@
     player.vx = moveX * speed;
     player.vy = moveY * speed;
     moveCircle(player, player.vx * dt, player.vy * dt, PLAYER_RADIUS);
+
+    const activelyAiming = (!isCoarsePointer && input.mouseActive) || input.aimPointer !== null || input.aimMagnitude > 0.14;
+    if (moveLength > 0.08 && !activelyAiming) {
+      if (Math.abs(moveX) > Math.abs(moveY)) player.direction = moveX < 0 ? 1 : 3;
+      else player.direction = moveY < 0 ? 2 : 0;
+    }
 
     if (moveLength > 0.08) {
       footstepCooldown -= dt;
