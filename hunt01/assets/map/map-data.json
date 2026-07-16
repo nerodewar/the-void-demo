@@ -8,7 +8,7 @@
     "y": 245
   },
   "alienSpawn": {
-    "x": 1510,
+    "x": 1450,
     "y": 235
   },
   "rooms": [
@@ -17,96 +17,96 @@
       "label": "CONTROL CORRIDOR",
       "x": 120,
       "y": 120,
-      "w": 650,
-      "h": 230
+      "w": 625,
+      "h": 220
     },
     {
       "id": "junction",
       "label": "EMERGENCY JUNCTION",
-      "x": 805,
-      "y": 110,
-      "w": 330,
-      "h": 300
+      "x": 785,
+      "y": 120,
+      "w": 320,
+      "h": 280
     },
     {
       "id": "maintenanceHall",
       "label": "MAINTENANCE HALL",
-      "x": 1180,
+      "x": 1145,
       "y": 120,
-      "w": 610,
-      "h": 230
+      "w": 570,
+      "h": 220
     },
     {
       "id": "powerRelay",
       "label": "POWER RELAY ROOM",
-      "x": 1830,
-      "y": 100,
-      "w": 450,
-      "h": 330
+      "x": 1755,
+      "y": 105,
+      "w": 470,
+      "h": 315
     },
     {
       "id": "coolant",
       "label": "COOLANT ACCESS",
       "x": 100,
-      "y": 450,
-      "w": 500,
-      "h": 300
+      "y": 440,
+      "w": 410,
+      "h": 295
     },
     {
       "id": "storage",
       "label": "STORAGE ROOM",
-      "x": 620,
-      "y": 420,
-      "w": 520,
-      "h": 340
+      "x": 555,
+      "y": 440,
+      "w": 350,
+      "h": 295
     },
     {
       "id": "tunnel",
       "label": "MAINTENANCE TUNNEL",
-      "x": 850,
-      "y": 390,
-      "w": 540,
-      "h": 540
+      "x": 875,
+      "y": 380,
+      "w": 370,
+      "h": 525
     },
     {
       "id": "engine",
       "label": "ENGINE ROOM",
-      "x": 850,
-      "y": 920,
-      "w": 540,
-      "h": 480
+      "x": 875,
+      "y": 955,
+      "w": 370,
+      "h": 400
     },
     {
       "id": "portAccess",
       "label": "PORT ENGINE ACCESS",
-      "x": 420,
-      "y": 1060,
-      "w": 450,
-      "h": 300
+      "x": 370,
+      "y": 1035,
+      "w": 530,
+      "h": 270
     },
     {
       "id": "starboardAccess",
       "label": "STARBOARD ENGINE ACCESS",
-      "x": 1370,
-      "y": 1060,
-      "w": 450,
-      "h": 300
+      "x": 1220,
+      "y": 1035,
+      "w": 530,
+      "h": 270
     },
     {
       "id": "portThruster",
       "label": "PORT THRUSTER CHAMBER",
-      "x": 70,
-      "y": 920,
-      "w": 610,
-      "h": 760
+      "x": 65,
+      "y": 900,
+      "w": 355,
+      "h": 720
     },
     {
       "id": "starboardThruster",
       "label": "STARBOARD THRUSTER CHAMBER",
-      "x": 1560,
-      "y": 920,
-      "w": 610,
-      "h": 760
+      "x": 1700,
+      "y": 900,
+      "w": 355,
+      "h": 720
     }
   ]
 }
