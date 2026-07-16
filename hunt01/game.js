@@ -1209,27 +1209,12 @@
     }
 
     const cameraEase = 1 - Math.pow(0.0008, dt);
-    let cameraTargetX = player.x + input.aimX * 70;
-    let cameraTargetY = player.y + input.aimY * 45;
-
-    // Edge chambers need room around them on wide iPad screens. While Luna is inside
-    // either thruster chamber, frame the complete chamber instead of pinning the
-    // camera to her position at the outer wall.
-    if (pointInRect(player.x, player.y, { x: 50, y: 1420, w: 410, h: 710 }, -40)) {
-      cameraTargetX = 255;
-      cameraTargetY = 1775;
-    } else if (pointInRect(player.x, player.y, { x: 2040, y: 1420, w: 410, h: 710 }, -40)) {
-      cameraTargetX = 2245;
-      cameraTargetY = 1775;
-    }
-
-    camera.x = lerp(camera.x, cameraTargetX, cameraEase);
-    camera.y = lerp(camera.y, cameraTargetY, cameraEase);
+    camera.x = lerp(camera.x, player.x + input.aimX * 70, cameraEase);
+    camera.y = lerp(camera.y, player.y + input.aimY * 45, cameraEase);
     const viewHalfW = cssWidth / (2 * zoom);
     const viewHalfH = cssHeight / (2 * zoom);
-    const edgeLookRoom = 180;
-    camera.x = clamp(camera.x, viewHalfW - edgeLookRoom, WORLD.width - viewHalfW + edgeLookRoom);
-    camera.y = clamp(camera.y, viewHalfH - edgeLookRoom, WORLD.height - viewHalfH + edgeLookRoom);
+    camera.x = clamp(camera.x, viewHalfW, WORLD.width - viewHalfW);
+    camera.y = clamp(camera.y, viewHalfH, WORLD.height - viewHalfH);
     camera.shake = Math.max(0, camera.shake - dt * 42);
   }
 
