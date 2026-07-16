@@ -69,50 +69,66 @@
   for (let i = 0; i < MAX_AMMO; i += 1) ammoPips.append(document.createElement("i"));
 
   const walkRects = [
-    { x: 120, y: 120, w: 650, h: 230, room: "CONTROL CORRIDOR" },
-    { x: 750, y: 185, w: 95, h: 105 },
-    { x: 805, y: 110, w: 330, h: 300, room: "EMERGENCY JUNCTION" },
-    { x: 1120, y: 185, w: 80, h: 105 },
-    { x: 1180, y: 120, w: 610, h: 230, room: "MAINTENANCE HALL" },
-    { x: 1780, y: 185, w: 80, h: 105 },
-    { x: 1830, y: 100, w: 450, h: 330, room: "POWER RELAY ROOM" },
-    { x: 275, y: 330, w: 110, h: 140 },
-    { x: 100, y: 450, w: 500, h: 300, room: "COOLANT ACCESS" },
-    { x: 580, y: 540, w: 95, h: 115 },
-    { x: 620, y: 420, w: 520, h: 340, room: "STORAGE ROOM" },
-    { x: 720, y: 330, w: 125, h: 130 },
-    { x: 820, y: 360, w: 220, h: 120 },
-    { x: 850, y: 390, w: 540, h: 540, room: "MAINTENANCE TUNNEL" },
-    { x: 970, y: 880, w: 300, h: 120 },
-    { x: 850, y: 890, w: 540, h: 110 },
-    { x: 850, y: 920, w: 540, h: 480, room: "ENGINE ROOM" },
-    { x: 420, y: 1060, w: 450, h: 300, room: "PORT ENGINE ACCESS" },
-    { x: 1370, y: 1060, w: 450, h: 300, room: "STARBOARD ENGINE ACCESS" },
-    { x: 820, y: 1080, w: 100, h: 250 },
-    { x: 1320, y: 1080, w: 100, h: 250 },
-    { x: 570, y: 1080, w: 110, h: 250 },
-    { x: 1560, y: 1080, w: 110, h: 250 },
-    { x: 70, y: 920, w: 610, h: 760, room: "PORT THRUSTER CHAMBER" },
-    { x: 1560, y: 920, w: 610, h: 760, room: "STARBOARD THRUSTER CHAMBER" }
+    // Upper route. These rectangles describe the actual inner floor, not the wall artwork.
+    { x: 145, y: 145, w: 575, h: 170, room: "CONTROL CORRIDOR" },
+    { x: 720, y: 190, w: 90, h: 80 },
+    { x: 810, y: 145, w: 270, h: 230, room: "EMERGENCY JUNCTION" },
+    { x: 1080, y: 190, w: 90, h: 80 },
+    { x: 1170, y: 145, w: 520, h: 170, room: "MAINTENANCE HALL" },
+    { x: 1690, y: 190, w: 90, h: 80 },
+    { x: 1780, y: 135, w: 420, h: 260, room: "POWER RELAY ROOM" },
+
+    // Support rooms and their genuine door openings.
+    { x: 250, y: 315, w: 90, h: 150 },
+    { x: 125, y: 465, w: 360, h: 245, room: "COOLANT ACCESS" },
+    { x: 485, y: 545, w: 95, h: 85 },
+    { x: 580, y: 465, w: 300, h: 245, room: "STORAGE ROOM" },
+    { x: 805, y: 375, w: 95, h: 90 },
+
+    // Central spine. Maintenance Tunnel and Engine Room are separate, aligned rooms.
+    { x: 900, y: 405, w: 320, h: 475, room: "MAINTENANCE TUNNEL" },
+    { x: 990, y: 880, w: 140, h: 100 },
+    { x: 900, y: 980, w: 320, h: 350, room: "ENGINE ROOM" },
+
+    // Two independent engine access corridors.
+    { x: 395, y: 1060, w: 505, h: 220, room: "PORT ENGINE ACCESS" },
+    { x: 1220, y: 1060, w: 505, h: 220, room: "STARBOARD ENGINE ACCESS" },
+
+    // Door throats into the two thruster chambers.
+    { x: 325, y: 1115, w: 70, h: 110 },
+    { x: 1725, y: 1115, w: 70, h: 110 },
+
+    // Thruster chambers. Their floors stop well inside the outer hull.
+    { x: 95, y: 930, w: 300, h: 650, room: "PORT THRUSTER CHAMBER" },
+    { x: 1725, y: 930, w: 300, h: 650, room: "STARBOARD THRUSTER CHAMBER" }
+  ];
+
+  const blockedRects = [
+    // Machinery islands are solid and provide useful cover rather than decorative ghost geometry.
+    { x: 1000, y: 1080, w: 120, h: 145 },
+    { x: 635, y: 525, w: 105, h: 85 },
+    { x: 1900, y: 205, w: 115, h: 100 },
+    { x: 155, y: 1180, w: 150, h: 225 },
+    { x: 1815, y: 1180, w: 150, h: 225 }
   ];
 
   const doors = {
-    engine: { x: 875, y: 900, w: 490, h: 44, open: false, label: "ENGINE DECK BULKHEAD" },
-    port: { x: 835, y: 1090, w: 55, h: 225, open: false, label: "PORT ACCESS BULKHEAD" },
-    starboard: { x: 1350, y: 1090, w: 55, h: 225, open: false, label: "STARBOARD ACCESS BULKHEAD" }
+    engine: { x: 990, y: 925, w: 140, h: 55, open: false, label: "ENGINE DECK BULKHEAD" },
+    port: { x: 845, y: 1090, w: 55, h: 160, open: false, label: "PORT ACCESS BULKHEAD" },
+    starboard: { x: 1220, y: 1090, w: 55, h: 160, open: false, label: "STARBOARD ACCESS BULKHEAD" }
   };
 
   const objects = {
-    relay: { id: "relay", x: 2140, y: 265, radius: 74, duration: 1.8, label: "RESTORE ENGINE-DECK POWER", sprite: [1, 5] },
-    recharge: { id: "recharge", x: 860, y: 610, radius: 80, duration: 2.65, label: "RECHARGE PLASMA CELLS", sprite: [0, 4] },
-    engine: { id: "engine", x: 1120, y: 1285, radius: 76, duration: 2.0, label: "PRIME MANUAL THRUSTER IGNITION", sprite: [1, 2] },
-    portSwitch: { id: "portSwitch", x: 535, y: 1130, radius: 74, duration: 0.8, label: "IGNITE PORT THRUSTER", sprite: [3, 4] },
-    starboardSwitch: { id: "starboardSwitch", x: 1665, y: 1130, radius: 74, duration: 0.8, label: "IGNITE STARBOARD THRUSTER", sprite: [3, 4] }
+    relay: { id: "relay", x: 2100, y: 265, radius: 74, duration: 1.8, label: "RESTORE ENGINE-DECK POWER", sprite: [1, 5] },
+    recharge: { id: "recharge", x: 815, y: 600, radius: 80, duration: 2.65, label: "RECHARGE PLASMA CELLS", sprite: [0, 4] },
+    engine: { id: "engine", x: 1060, y: 1260, radius: 76, duration: 2.0, label: "PRIME MANUAL THRUSTER IGNITION", sprite: [1, 2] },
+    portSwitch: { id: "portSwitch", x: 335, y: 1035, radius: 74, duration: 0.8, label: "IGNITE PORT THRUSTER", sprite: [3, 4] },
+    starboardSwitch: { id: "starboardSwitch", x: 1785, y: 1035, radius: 74, duration: 0.8, label: "IGNITE STARBOARD THRUSTER", sprite: [3, 4] }
   };
 
   const killZones = {
-    port: { x: 255, y: 1370, w: 250, h: 205 },
-    starboard: { x: 1735, y: 1370, w: 250, h: 205 }
+    port: { x: 120, y: 1370, w: 245, h: 175 },
+    starboard: { x: 1755, y: 1370, w: 245, h: 175 }
   };
 
   const ambientLights = [
@@ -265,7 +281,7 @@
   };
 
   const alien = {
-    x: 1510, y: 235, vx: 0, vy: 0,
+    x: 1450, y: 235, vx: 0, vy: 0,
     state: "stalking", awake: false,
     stun: 0, slow: 0, attackCooldown: 0,
     chargeCooldown: 4.2, chargeTime: 0,
@@ -302,12 +318,16 @@
     return walkRects.some((rect) => pointInRect(x, y, rect, 0));
   }
 
+  function isInsideBlockedGeometry(x, y, margin = 0) {
+    return blockedRects.some((rect) => pointInRect(x, y, rect, -margin));
+  }
+
   function isWalkable(x, y, radius = 0) {
     if (x < radius || y < radius || x > WORLD.width - radius || y > WORLD.height - radius) return false;
     const samples = radius > 0
       ? [[0,0],[radius,0],[-radius,0],[0,radius],[0,-radius],[radius*.7,radius*.7],[-radius*.7,radius*.7],[radius*.7,-radius*.7],[-radius*.7,-radius*.7]]
       : [[0,0]];
-    return samples.every(([ox, oy]) => isInsideWalkUnion(x + ox, y + oy) && !isDoorBlocking(x + ox, y + oy));
+    return samples.every(([ox, oy]) => isInsideWalkUnion(x + ox, y + oy) && !isInsideBlockedGeometry(x + ox, y + oy, 1) && !isDoorBlocking(x + ox, y + oy));
   }
 
   function moveCircle(entity, dx, dy, radius) {
@@ -364,7 +384,7 @@
       invulnerable: 0, damageAnim: 0, rechargeCooldown: 0
     });
     Object.assign(alien, {
-      x: 1510, y: 235, vx: 0, vy: 0, state: "stalking", awake: false,
+      x: 1450, y: 235, vx: 0, vy: 0, state: "stalking", awake: false,
       stun: 0, slow: 0, recover: 0, attackCooldown: 0, chargeCooldown: 5.8,
       chargeTime: 0, chargeX: 0, chargeY: 0, path: [], pathIndex: 0,
       killZoneTime: 0, alignedSide: null
@@ -1460,6 +1480,8 @@
     else {
       ctx.fillStyle = "#11181d";
       for (const rect of walkRects) ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
+      ctx.fillStyle = "rgba(255,60,60,.28)";
+      for (const rect of blockedRects) ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
     }
 
     drawAmbient();
