@@ -1,19 +1,112 @@
 {
-  "world": {"width": 2400, "height": 1800},
-  "playerSpawn": {"x": 390, "y": 245},
-  "alienSpawn": {"x": 1510, "y": 235},
+  "world": {
+    "width": 2400,
+    "height": 1800
+  },
+  "playerSpawn": {
+    "x": 390,
+    "y": 245
+  },
+  "alienSpawn": {
+    "x": 1510,
+    "y": 235
+  },
   "rooms": [
-    {"id":"control","label":"CONTROL CORRIDOR","x":120,"y":120,"w":650,"h":230},
-    {"id":"junction","label":"EMERGENCY JUNCTION","x":805,"y":110,"w":330,"h":300},
-    {"id":"maintenanceHall","label":"MAINTENANCE HALL","x":1180,"y":120,"w":610,"h":230},
-    {"id":"powerRelay","label":"POWER RELAY ROOM","x":1830,"y":100,"w":450,"h":330},
-    {"id":"coolant","label":"COOLANT ACCESS","x":100,"y":450,"w":500,"h":300},
-    {"id":"storage","label":"STORAGE ROOM","x":650,"y":440,"w":420,"h":300},
-    {"id":"tunnel","label":"MAINTENANCE TUNNEL","x":970,"y":410,"w":300,"h":500},
-    {"id":"engine","label":"ENGINE ROOM","x":970,"y":940,"w":300,"h":420},
-    {"id":"portAccess","label":"PORT ENGINE ACCESS","x":600,"y":1110,"w":370,"h":180},
-    {"id":"starboardAccess","label":"STARBOARD ENGINE ACCESS","x":1270,"y":1110,"w":370,"h":180},
-    {"id":"portThruster","label":"PORT THRUSTER CHAMBER","x":160,"y":980,"w":440,"h":650},
-    {"id":"starboardThruster","label":"STARBOARD THRUSTER CHAMBER","x":1640,"y":980,"w":440,"h":650}
+    {
+      "id": "control",
+      "label": "CONTROL CORRIDOR",
+      "x": 120,
+      "y": 120,
+      "w": 650,
+      "h": 230
+    },
+    {
+      "id": "junction",
+      "label": "EMERGENCY JUNCTION",
+      "x": 805,
+      "y": 110,
+      "w": 330,
+      "h": 300
+    },
+    {
+      "id": "maintenanceHall",
+      "label": "MAINTENANCE HALL",
+      "x": 1180,
+      "y": 120,
+      "w": 610,
+      "h": 230
+    },
+    {
+      "id": "powerRelay",
+      "label": "POWER RELAY ROOM",
+      "x": 1830,
+      "y": 100,
+      "w": 450,
+      "h": 330
+    },
+    {
+      "id": "coolant",
+      "label": "COOLANT ACCESS",
+      "x": 100,
+      "y": 450,
+      "w": 500,
+      "h": 300
+    },
+    {
+      "id": "storage",
+      "label": "STORAGE ROOM",
+      "x": 620,
+      "y": 420,
+      "w": 520,
+      "h": 340
+    },
+    {
+      "id": "tunnel",
+      "label": "MAINTENANCE TUNNEL",
+      "x": 850,
+      "y": 390,
+      "w": 540,
+      "h": 540
+    },
+    {
+      "id": "engine",
+      "label": "ENGINE ROOM",
+      "x": 850,
+      "y": 920,
+      "w": 540,
+      "h": 480
+    },
+    {
+      "id": "portAccess",
+      "label": "PORT ENGINE ACCESS",
+      "x": 420,
+      "y": 1060,
+      "w": 450,
+      "h": 300
+    },
+    {
+      "id": "starboardAccess",
+      "label": "STARBOARD ENGINE ACCESS",
+      "x": 1370,
+      "y": 1060,
+      "w": 450,
+      "h": 300
+    },
+    {
+      "id": "portThruster",
+      "label": "PORT THRUSTER CHAMBER",
+      "x": 70,
+      "y": 920,
+      "w": 610,
+      "h": 760
+    },
+    {
+      "id": "starboardThruster",
+      "label": "STARBOARD THRUSTER CHAMBER",
+      "x": 1560,
+      "y": 920,
+      "w": 610,
+      "h": 760
+    }
   ]
 }
